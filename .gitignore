@@ -1,3 +1,6 @@
 data/*.tbz2
+data/140824
+data/140826
+data/160829
 .ipynb_checkpoints/
 temp*.ipynb
