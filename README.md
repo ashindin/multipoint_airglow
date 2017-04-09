@@ -4,4 +4,5 @@
 ## Dependencies:
 
 1. Anaconda3
-2. astrometry.net (for Windows: Cygwin +astrometry.net)
+2. **wget** in Path (for Windows - **wget** from GnuWin32).
+3. astrometry.net (for Windows - Cygwin + astrometry.net)

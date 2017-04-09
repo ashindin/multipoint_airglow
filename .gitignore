@@ -1,0 +1,3 @@
+data/*.tbz2
+.ipynb_checkpoints/
+temp*.ipynb
