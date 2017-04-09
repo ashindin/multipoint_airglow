@@ -3,7 +3,7 @@ import requests
 import json
 import os
 
-def download_check_unpack_data()
+def download_check_unpack_data():
 
 	urls_filename="./data/download_urls.txt"
 	fid=open(urls_filename,'r')
@@ -88,9 +88,9 @@ def download_check_unpack_data()
 			print("Error! Something wrong with data unpacking!")
 			return 1
 		
-		else:
-			print("Downloaded files are corrupted!")
-			return 1
+	else:
+		print("Downloaded files are corrupted!")
+		return 1
 
 ret=download_check_unpack_data()
 if ret==0:
