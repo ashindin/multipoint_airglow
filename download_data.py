@@ -32,8 +32,12 @@ def download_check_unpack_data():
 
 
 	for i in range(len(direct_urls)):
-		print("Downloading file " + str(i))
-		os.system('wget -O ' + filenames[i] +' "'+ direct_urls[i]+'"')
+		if os.path.exists(filenames[i])==True:
+			print("File " + filenames[i] + " already exists")
+			continue
+		else:
+			print("Downloading file " + filenames[i])
+			os.system('wget -O ' + filenames[i] +' "'+ direct_urls[i]+'"')
 
 	if os.system("cd data && md5sum -c twopoint_data_optic_2014_2016.md5")==0:
 
