@@ -61,5 +61,5 @@ make CFITS_INC="-I/usr/local/include" CFITS_LIB="-L/usr/local/lib -lcfitsio"
 make extra  
 make install
 
-8. **Add astrometry binaries to cygwin's PATH:** 
+8. **Add astrometry binaries to cygwin's PATH:**  
 echo PATH='$PATH':/usr/local/astrometry/bin >> .bash_profile
