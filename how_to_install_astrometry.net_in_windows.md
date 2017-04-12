@@ -65,3 +65,14 @@ cd ~
 
 8. **Add astrometry binaries to cygwin's PATH:**  
 echo PATH='$PATH':/usr/local/astrometry/bin >> .bash_profile  
+
+9. **Grab index files for wide-angle images:**  
+cd /usr/local/astrometry/data  
+wget http://data.astrometry.net/4100/index-4112.fits  
+wget http://data.astrometry.net/4100/index-4113.fits  
+wget http://data.astrometry.net/4100/index-4114.fits  
+wget http://data.astrometry.net/4100/index-4115.fits  
+wget http://data.astrometry.net/4100/index-4116.fits  
+wget http://data.astrometry.net/4100/index-4117.fits  
+wget http://data.astrometry.net/4100/index-4118.fits  
+wget http://data.astrometry.net/4100/index-4119.fits  
