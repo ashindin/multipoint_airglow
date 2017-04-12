@@ -28,7 +28,7 @@ Science/gsl
 Web/lynx  
 Web/wget  
 **Command to install all these packages in windows command line:**  
-setup-x86.exe -P bzip2, gcc-core, clang, make, swig, pkg-config, libnetpbm-devel, netpbm, libcairo-devel, libjpeg-devel, libgsl-devel, libpcre-devel, libpixman1-devel, libX11-xcb-devel, libxcb-glx-devel, libXdamage-devel, zlib-devel, python2-numpy, python2-devel, gsl, lynx, wget  
+setup-x86.exe -P bzip2 -P gcc-core -P clang -P make -P swig -P pkg-config -P libnetpbm-devel -P netpbm -P libcairo-devel -P libjpeg-devel -P libgsl-devel -P libpcre-devel -P libpixman1-devel -P libX11-xcb-devel -P libxcb-glx-devel -P libXdamage-devel -P zlib-devel -P python2-numpy -P python2-devel -P gsl -P lynx -P wget  
 *Note that you need to change setup-x86.exe to setup-x86_64.exe if you use the 64 bit version of cygwin*
 
 3. **Add "C:\cygwin\bin" to PATH** 
