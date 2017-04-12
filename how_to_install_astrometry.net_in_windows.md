@@ -65,4 +65,3 @@ cd ~
 
 8. **Add astrometry binaries to cygwin's PATH:**  
 echo PATH='$PATH':/usr/local/astrometry/bin >> .bash_profile  
-export PATH='$PATH':/usr/local/astrometry/bin

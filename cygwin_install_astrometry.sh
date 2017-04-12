@@ -25,4 +25,4 @@ make extra
 make install
 cd ~
 echo PATH='$PATH':/usr/local/astrometry/bin >> .bash_profile
-export PATH='$PATH':/usr/local/astrometry/bin
+
