@@ -34,6 +34,7 @@ setup-x86.exe -P bzip2 -P gcc-core -P clang -P make -P swig -P pkg-config -P lib
 3. **Add "C:\cygwin\bin" to PATH** 
 
 4. **Install pip under cygwin. In cygwin terminal (as Administrator!) run:**  
+cd ~  
 lynx -source https://bootstrap.pypa.io/get-pip.py | python
 
 5. **Install astropy via cygwin's pip:**  
@@ -47,7 +48,7 @@ cd cfitsio
 ./configure --prefix=/usr/local  
 make  
 make install  
-cd ..
+cd ..  
 
 7. **Install astrometry.net:**  
 wget http://astrometry.net/downloads/astrometry.net-latest.tar.gz  
@@ -60,6 +61,7 @@ cd ..
 make CFITS_INC="-I/usr/local/include" CFITS_LIB="-L/usr/local/lib -lcfitsio"  
 make extra  
 make install
+cd ~  
 
 8. **Add astrometry binaries to cygwin's PATH:**  
 echo PATH='$PATH':/usr/local/astrometry/bin >> .bash_profile

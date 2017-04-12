@@ -11,8 +11,9 @@ cd cfitsio
 ./configure --prefix=/usr/local  
 make  
 make install  
-cd .
+cd ..
 
+wget http://astrometry.net/downloads/astrometry.net-latest.tar.gz  
 tar -xvzf astrometry.net-latest.tar.gz  
 cd astrometry.net-0.70  
 cd util  
@@ -22,5 +23,6 @@ cd ..
 make CFITS_INC="-I/usr/local/include" CFITS_LIB="-L/usr/local/lib -lcfitsio"  
 make extra  
 make install
-
+cd ~
 echo PATH='$PATH':/usr/local/astrometry/bin >> .bash_profile
+export PATH='$PATH':/usr/local/astrometry/bin
