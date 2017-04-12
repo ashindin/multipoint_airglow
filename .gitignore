@@ -5,3 +5,4 @@ data/160829
 astrometric_calibration/.temp
 .ipynb_checkpoints/
 temp*.ipynb
+astrometric_calibration/*.dat
