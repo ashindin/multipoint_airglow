@@ -20,22 +20,13 @@ from tan_module import *
 
 win_com_prefix='bash --login -c "('
 win_com_postfix=')"'
-s1c_solve_pars='--scale-units arcsecperpix --scale-low 250 --scale-high 270'
+sbig_solve_pars='--depth 11-20'
 
-def s1c_get_date_obs(filename,ut_shift=-3):
-    fdt=open(filename,'r',errors = 'ignore')
-    fdt.seek(8*80)
-    test=fdt.read(39)
-    fdt.close()
-    test=test[15::]
-    ms=test[16:20]
-    if ms=='1000':
-        test=test[0:16]+'000 2014'
-#         test[16]='0'
-        obs_time=datetime.datetime.strptime(test,'%b %d %H:%M:%S.%f %Y')+datetime.timedelta(hours=ut_shift)+datetime.timedelta(seconds=1)
-    else:
-        obs_time=datetime.datetime.strptime(test,'%b %d %H:%M:%S.%f %Y')+datetime.timedelta(hours=ut_shift)
-    return obs_time
+def sbig_get_date_obs(filename):
+    fid_fit=fits.open(filename);
+    date_obs_str=fid_fit[0].header["DATE-OBS"]  
+    fid_fit.close()
+    return datetime.datetime.strptime(date_obs_str,"%Y-%m-%dT%H:%M:%S.%f")
 
 def image2xy(fname, out_dir):
     os_name=platform.system()
@@ -50,7 +41,7 @@ def image2xy(fname, out_dir):
     return  os.system(com_line), out_name
 # image2xy(fname, spath)
 
-def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,lat_deg=56.1501667,lon_deg=46.1050833,hei_m=183.):
+def sbig_solve_field_altaz(fname, solve_pars, get_date_obs_fun=sbig_get_date_obs,lat_deg=56.1501667,lon_deg=46.1050833,hei_m=183.):
     os_name=platform.system()
     
     fname=os.path.abspath(fname)
@@ -82,7 +73,9 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
         return 2
     
     site=EarthLocation(lat=lat_deg*u.deg, lon=lon_deg*u.deg, height=hei_m*u.m)
-        
+    
+
+    
     fname_xy=axy_fname[0:-4]+'-indx.xyls'
     fname_rd=axy_fname[0:-4]+'.rdls'
     
@@ -100,7 +93,7 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
         return np.nan,np.nan,np.array([np.nan, np.nan, np.nan]),np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]),np.array([np.nan, np.nan, np.nan])
         
 
-    date_obs=get_date_obs_fun(fname,ut_shift=-4)
+    date_obs=get_date_obs_fun(fname)
 
     hdulist = fits.open(fname_xy)
 
@@ -150,38 +143,12 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     return az0,alt0,az_c,alt_c,a,b,c,d
 
 
-fit_path="../data/140824/s1c"
+fit_path="../data/160829/sbig"
 fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
-res_fid=open('solve_field_altaz_140824_s1c.dat','w')
-res_fid.write("# filename.fit az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
+res_fid=open('solve_field_altaz_160829_sbig.dat','w')
+res_fid.write("# filename.FIT az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
 for i in range(len(fit_filenames)):
-    ret = s1c_solve_field_altaz(fit_filenames[i],s1c_solve_pars)
-    if len(ret)==8:
-        az0=ret[0]
-        alt0=ret[1]
-        az_c=ret[2]
-        alt_c=ret[3]
-        a=ret[4]
-        b=ret[5]
-        c=ret[6]
-        d=ret[7]
-        str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)+ " "
-        str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
-        str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
-        str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
-        str_to_file+=" " + str(d[0]) + " " + str(d[1]) + " " + str(d[2]) + "\n"
-        res_fid.write(str_to_file)
-    else:
-        print(ret)
-        print(str(i)," ",fit_filenames[i].split("/")[-1]," ERROR")
-res_fid.close()
-
-fit_path="../data/140826/s1c"
-fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
-res_fid=open('solve_field_altaz_140826_s1c.dat','w')
-res_fid.write("# filename.fit az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
-for i in range(len(fit_filenames)):
-    ret = s1c_solve_field_altaz(fit_filenames[i],s1c_solve_pars)
+    ret = sbig_solve_field_altaz(fit_filenames[i],sbig_solve_pars)
     if type(ret)!=int:
         az0=ret[0]
         alt0=ret[1]

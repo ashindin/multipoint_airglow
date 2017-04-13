@@ -3,6 +3,7 @@ data/140824
 data/140826
 data/160829
 astrometric_calibration/.temp
+astrometric_calibration/__pycache__/
 .ipynb_checkpoints/
 temp*.ipynb
 astrometric_calibration/*.dat
