@@ -4,7 +4,7 @@ The following instruction based on [this](https://sites.google.com/site/jmastron
 
 1. **Download Cygwin ([x86](https://www.cygwin.com/setup-x86.exe) or [x86_64](https://www.cygwin.com/setup-x86.exe)). Tested with version 2.877**
 
-2. **Install Cygwin to default directory ("C:\cygwin"). Also the following packages have to be installed with all dependencies:**  
+2. **Install Cygwin with following packages:**  
 Archive/bzip2  
 Devel/gcc-core  
 Devel/clang  
@@ -29,9 +29,9 @@ Web/lynx
 Web/wget  
 **Command to install all these packages in windows command line:**  
 setup-x86.exe -P bzip2 -P gcc-core -P clang -P make -P swig -P pkg-config -P libnetpbm-devel -P netpbm -P libcairo-devel -P libjpeg-devel -P libgsl-devel -P libpcre-devel -P libpixman1-devel -P libX11-xcb-devel -P libxcb-glx-devel -P libXdamage-devel -P zlib-devel -P python2-numpy -P python2-devel -P gsl -P lynx -P wget  
-And for 64-bit version of cygwin:  
-setup-x86_64.exe -P bzip2 -P gcc-core -P clang -P make -P swig -P pkg-config -P libnetpbm-devel -P netpbm -P libcairo-devel -P libjpeg-devel -P libgsl-devel -P libpcre-devel -P libpixman1-devel -P libX11-xcb-devel -P libxcb-glx-devel -P libXdamage-devel -P zlib-devel -P python2-numpy -P python2-devel -P gsl -P lynx -P wget
-3. **Add "C:\cygwin\bin" to PATH** 
+**And for 64-bit version of cygwin:**  
+setup-x86_64.exe -P bzip2 -P gcc-core -P clang -P make -P swig -P pkg-config -P libnetpbm-devel -P netpbm -P libcairo-devel -P libjpeg-devel -P libgsl-devel -P libpcre-devel -P libpixman1-devel -P libX11-xcb-devel -P libxcb-glx-devel -P libXdamage-devel -P zlib-devel -P python2-numpy -P python2-devel -P gsl -P lynx -P wget  
+3. **Add cygwin's bin directory (e.g. "C:\cygwin\bin") to PATH**  
 
 4. **Install pip under cygwin. In cygwin terminal (as Administrator!) run:**  
 cd ~  

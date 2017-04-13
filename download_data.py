@@ -37,7 +37,7 @@ def download_check_unpack_data():
 			continue
 		else:
 			print("Downloading file " + filenames[i])
-			os.system('wget --no-check-certificate -O ' + filenames[i] +' "'+ direct_urls[i]+'"')
+			os.system('wget -O ' + filenames[i] +' "'+ direct_urls[i]+'"')
 
 	if os.system("cd data && md5sum -c twopoint_data_optic_2014_2016.md5")==0:
 
