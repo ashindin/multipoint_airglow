@@ -165,7 +165,7 @@ for i in range(len(fit_filenames)):
         b=ret[5]
         c=ret[6]
         d=ret[7]
-        str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)+ " "
+        str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
         str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
         str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
         str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
@@ -191,7 +191,7 @@ for i in range(len(fit_filenames)):
         b=ret[5]
         c=ret[6]
         d=ret[7]
-        str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)+ " "
+        str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
         str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
         str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
         str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
