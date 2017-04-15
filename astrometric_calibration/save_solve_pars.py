@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def get_solve_coefs(solve_fname):
     fid=open(solve_fname,'r')
