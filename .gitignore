@@ -6,4 +6,7 @@ astrometric_calibration/.temp
 astrometric_calibration/__pycache__/
 .ipynb_checkpoints/
 temp*.ipynb
+temp*.py
 astrometric_calibration/*.dat
+astrometric_calibration/*.fit
+astrometric_calibration/*.FIT
