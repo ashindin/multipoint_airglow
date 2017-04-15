@@ -147,7 +147,7 @@ def save_solve_data(fit_path,solve_fname):
 	fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
 	res_fid=open(solve_fname,'w')
 	res_fid.write("# filename.fit az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
-	for i in range(3):#range(len(fit_filenames)):
+	for i in range(len(fit_filenames)):
 		ret = sbig_solve_field_altaz(fit_filenames[i],sbig_solve_pars)
 		if type(ret)!=int:
 			az0=ret[0]
