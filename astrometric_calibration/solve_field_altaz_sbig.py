@@ -17,6 +17,7 @@ from astropy.utils.exceptions import AstropyWarning
 warnings.simplefilter('ignore', category=AstropyWarning)
 
 from tan_module import *
+from save_solve_pars import *
 
 win_com_prefix='bash --login -c "('
 win_com_postfix=')"'
@@ -142,29 +143,34 @@ def sbig_solve_field_altaz(fname, solve_pars, get_date_obs_fun=sbig_get_date_obs
     print("Central pixel direction (AZ, ALT in deg):",az_c*180/np.pi,alt_c*180/np.pi)       
     return az0,alt0,az_c,alt_c,a,b,c,d
 
+def save_solve_data(fit_path,solve_fname):
+	fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
+	res_fid=open(solve_fname,'w')
+	res_fid.write("# filename.fit az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
+	for i in range(3):#range(len(fit_filenames)):
+		ret = sbig_solve_field_altaz(fit_filenames[i],sbig_solve_pars)
+		if type(ret)!=int:
+			az0=ret[0]
+			alt0=ret[1]
+			az_c=ret[2]
+			alt_c=ret[3]
+			a=ret[4]
+			b=ret[5]
+			c=ret[6]
+			d=ret[7]
+			str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
+			str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
+			str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
+			str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
+			str_to_file+=" " + str(d[0]) + " " + str(d[1]) + " " + str(d[2]) + "\n"
+			res_fid.write(str_to_file)
+		else:
+			print(ret)
+			print(str(i)," ",fit_filenames[i].split("/")[-1]," ERROR")
+	res_fid.close()
 
 fit_path="../data/160829/sbig"
-fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
-res_fid=open('solve_field_altaz_160829_sbig.dat','w')
-res_fid.write("# filename.FIT az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
-for i in range(len(fit_filenames)):
-    ret = sbig_solve_field_altaz(fit_filenames[i],sbig_solve_pars)
-    if type(ret)!=int:
-        az0=ret[0]
-        alt0=ret[1]
-        az_c=ret[2]
-        alt_c=ret[3]
-        a=ret[4]
-        b=ret[5]
-        c=ret[6]
-        d=ret[7]
-        str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
-        str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
-        str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
-        str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
-        str_to_file+=" " + str(d[0]) + " " + str(d[1]) + " " + str(d[2]) + "\n"
-        res_fid.write(str_to_file)
-    else:
-        print(ret)
-        print(str(i)," ",fit_filenames[i].split("/")[-1]," ERROR")
-res_fid.close()
+solve_fname="solve_field_altaz_160829_sbig.dat"
+save_fname="sbig_160829_solve.pars"
+save_solve_data(fit_path,solve_fname)
+save_med_solve_pars(solve_fname,save_fname)

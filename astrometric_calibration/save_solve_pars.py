@@ -56,7 +56,7 @@ def save_med_solve_pars(solve_fname,save_fname):
     c_med=c[med_ind,:]
     d_med=d[med_ind,:]
     fid=open(save_fname,'w')
-    fid.write("az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
+    fid.write("# az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
     str_to_file=str(az0_med)+ " " +str(alt0_med)
     str_to_file+=" " + str(a_med[0]) + " " + str(a_med[1]) + " " + str(a_med[2])
     str_to_file+=" " + str(b_med[0]) + " " + str(b_med[1]) + " " + str(b_med[2])
