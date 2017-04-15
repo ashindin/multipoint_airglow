@@ -180,10 +180,10 @@ fit_path="../data/140824/s1c"
 solve_fname="solve_field_altaz_140824_s1c.dat"
 save_fname="s1c_140824_solve.pars"
 save_solve_data(fit_path,solve_fname)
-save_med_solve_pars(save_fname)
+save_med_solve_pars(solve_fname,save_fname)
 
 fit_path="../data/140826/s1c"
 solve_fname="solve_field_altaz_140826_s1c.dat"
 save_fname="s1c_140826_solve.pars"
 save_solve_data(fit_path,solve_fname)
-save_med_solve_pars(save_fname)
+save_med_solve_pars(solve_fname,save_fname)
