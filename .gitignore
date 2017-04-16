@@ -12,3 +12,4 @@ astrometric_calibration/*.fit
 astrometric_calibration/*.FIT
 astrometric_calibration/*.pars
 astrometric_calibration/*.png
+astrometric_calibration/*.mp4
