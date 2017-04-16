@@ -10,3 +10,5 @@ temp*.py
 astrometric_calibration/*.dat
 astrometric_calibration/*.fit
 astrometric_calibration/*.FIT
+astrometric_calibration/*.pars
+astrometric_calibration/*.png
