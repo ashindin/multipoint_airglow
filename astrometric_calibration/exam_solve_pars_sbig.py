@@ -154,10 +154,10 @@ def sbig_exam_solving_pic(fit_path,save_fname, lat_deg=56.1501667,lon_deg=46.105
         plt.pcolormesh(img, cmap="gray", vmin=np.median(img)-vrange+vshift, vmax=np.median(img)+vrange+vshift)
         plt.axis('equal')
         plt.plot(X[0],Y[0],marker="o", lw=0.,mec="g", mfc='none',mew=mew, ms=ms)
-        plt.text(X[0], Y[0], str(sao_nums_filt2[0]),color='g')
+        plt.text(X[0], Y[0], str(sao_nums_filt2[0]),color='w')
         for j in range(1,6):
             plt.plot(X[j],Y[j],marker="o", lw=0.,mec="b",mew=mew, ms=ms, mfc='none')
-            plt.text(X[j], Y[j], str(sao_nums_filt2[j]),color='b')
+            plt.text(X[j], Y[j], str(sao_nums_filt2[j]),color='w')
         plt.plot(X[5::],Y[5::],marker="o", lw=0.,mew=mew,mec="r", mfc='none',ms=ms)
         ax.set_xlim((1,372))
         ax.set_ylim((281,1)) 
