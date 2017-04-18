@@ -170,12 +170,18 @@ solve_fname="solve_field_altaz_140824_keo.dat"
 save_fname="keo_140824_solve.pars"
 save_solve_data(fit_path,solve_fname)
 save_med_solve_pars(solve_fname,save_fname)
+table_fname="keo_stars_140824.table"
+save_manual_fname="keo_140824_solve_manual.pars"
+save_keo_manual_solve_pars(table_fname, save_manual_fname)
 
 fit_path="../data/140826/keo"
 solve_fname="solve_field_altaz_140826_keo.dat"
 save_fname="keo_140826_solve.pars"
 save_solve_data(fit_path,solve_fname)
 save_med_solve_pars(solve_fname,save_fname)
+table_fname="keo_stars_140826.table"
+save_manual_fname="keo_140826_solve_manual.pars"
+save_keo_manual_solve_pars(table_fname, save_manual_fname)
 
 fit_path="../data/160829/keo"
 solve_fname="solve_field_altaz_160829_keo.dat"

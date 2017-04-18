@@ -246,6 +246,10 @@ movie_fname="keo_140824_solve.mp4"
 png_prefix, num_frames= keo_exam_solving_pic(fit_path,save_fname)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 
+save_fname="keo_140824_solve_manual.pars"
+movie_fname="keo_140824_solve_manual.mp4"
+png_prefix, num_frames= keo_exam_solving_pic(fit_path,save_fname)
+make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 
 # In[12]:
 
@@ -255,6 +259,10 @@ movie_fname="keo_140826_solve.mp4"
 png_prefix, num_frames= keo_exam_solving_pic(fit_path,save_fname)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 
+save_fname="keo_140826_solve_manual.pars"
+movie_fname="keo_140826_solve_manual.mp4"
+png_prefix, num_frames= keo_exam_solving_pic(fit_path,save_fname)
+make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 
 # In[21]:
 
