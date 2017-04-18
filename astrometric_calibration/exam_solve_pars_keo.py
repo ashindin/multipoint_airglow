@@ -119,6 +119,9 @@ def keo_exam_solving_pic(fit_path,save_fname, lat_deg=55.9305361,lon_deg=48.7444
         
     num_frames=len(fit_filenames)
 #     num_frames=10
+
+    X0=230
+    Y0=380
         
     for i in range(num_frames):
         sys.stdout.write('\r')
@@ -145,6 +148,14 @@ def keo_exam_solving_pic(fit_path,save_fname, lat_deg=55.9305361,lon_deg=48.7444
 
         X,Y = arc_hor2pix(AZ,ALT,az0,alt0,c,d)
 
+        R=np.sqrt((X-X0)**2+(Y-Y0)**2)
+        I=np.argsort(R)
+        X=X[I]
+        Y=Y[I]
+        sao_nums_filt2=sao_nums_filt2[I]
+        AZ=AZ[I]
+        ALT=ALT[I]
+        
         hdulist = fits.open(fname,ignore_missing_end=True)
         img=hdulist[0].data
         hdulist.close()
@@ -253,3 +264,7 @@ movie_fname="keo_160829_solve.mp4"
 png_prefix, num_frames= keo_exam_solving_pic(fit_path,save_fname)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 
+save_fname="keo_160829_solve_manual.pars"
+movie_fname="keo_160829_solve_manual.mp4"
+png_prefix, num_frames= keo_exam_solving_pic(fit_path,save_fname)
+make_movie_from_pngs(png_prefix, num_frames, movie_fname)
