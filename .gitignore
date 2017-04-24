@@ -16,3 +16,4 @@ astrometric_calibration/*.mp4
 spectrophotometric_calibration/*.fit
 spectrophotometric_calibration/.temp
 spectrophotometric_calibration/__pycache__/
+spectrophotometric_calibration/*.mp4
