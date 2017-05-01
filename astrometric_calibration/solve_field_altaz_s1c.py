@@ -1,6 +1,6 @@
 import datetime
 import time
-import subprocess
+#import subprocess
 import os
 import platform
 from pathlib import Path
@@ -53,7 +53,7 @@ def image2xy(fname, out_dir):
 
 def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,lat_deg=56.1501667,lon_deg=46.1050833,hei_m=183.):
     os_name=platform.system()
-    
+
     fname=os.path.abspath(fname)
 #     print(fname)
     path, file = os.path.split(fname)
@@ -61,19 +61,19 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     fname_axy_abs=spath+"/"+file[:-4]+".axy"
     if not os.path.exists(spath):
         os.makedirs(spath)
-        
+
     if os_name=='Windows':
         fname="/cygdrive/"+fname.replace(":","").replace("\\","/")
 #     print(fname)
     path, file = os.path.split(fname)
     spath=path+"/.temp"
-#     print(spath)    
-    
+#     print(spath)
+
     err_code, axy_fname = image2xy(fname, spath)
-    
+
     if err_code!=0:
         return 1
-    
+
     com_line='cd ' + spath  + ' && /usr/local/astrometry/bin/solve-field ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
@@ -81,17 +81,17 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     err_code=os.system(com_line)
     if err_code!=0:
         return 2
-    
+
     site=EarthLocation(lat=lat_deg*u.deg, lon=lon_deg*u.deg, height=hei_m*u.m)
-        
+
     fname_xy=axy_fname[0:-4]+'-indx.xyls'
     fname_rd=axy_fname[0:-4]+'.rdls'
-    
+
     if os_name=='Windows':
         fname=fname[10::]
         fname=fname[0]+':'+fname[1::]
         fname_xy=fname_xy[10::]
-        fname_xy=fname_xy[0]+':'+fname_xy[1::]    
+        fname_xy=fname_xy[0]+':'+fname_xy[1::]
         fname_rd=fname_rd[10::]
         fname_rd=fname_rd[0]+':'+fname_rd[1::]
 #     print(fname_xy)
@@ -99,7 +99,7 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
 #     print(axy_fname)
     if Path(fname_rd).is_file()==False:
         return np.nan,np.nan,np.array([np.nan, np.nan, np.nan]),np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]),np.array([np.nan, np.nan, np.nan])
-        
+
 
     date_obs=get_date_obs_fun(fname,ut_shift=-4)
 
@@ -143,11 +143,11 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
 
     az0=res_x[0];
     alt0=res_x[1];
-    
+
     a,b,c,d=tan_calc_pix2st_coefs((az0,alt0),AZ,ALT,X,Y)
 #     print(az0*180/np.pi,alt0*180/np.pi)
     az_c, alt_c = tan_pix2hor(144,144,az0,alt0,a,b)
-    print("Central pixel direction (AZ, ALT in deg):",az_c*180/np.pi,alt_c*180/np.pi)       
+    print("Central pixel direction (AZ, ALT in deg):",az_c*180/np.pi,alt_c*180/np.pi)
     return az0,alt0,az_c,alt_c,a,b,c,d
 
 def save_solve_data(fit_path,solve_fname):
@@ -175,7 +175,7 @@ def save_solve_data(fit_path,solve_fname):
 			print(ret)
 			print(str(i)," ",fit_filenames[i].split("/")[-1]," ERROR")
 	res_fid.close()
-	
+
 fit_path="../data/140824/s1c"
 solve_fname="solve_field_altaz_140824_s1c.dat"
 save_fname="s1c_140824_solve.pars"

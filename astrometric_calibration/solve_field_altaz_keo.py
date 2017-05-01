@@ -1,6 +1,6 @@
 import datetime
 import time
-import subprocess
+#import subprocess
 import os
 import platform
 from pathlib import Path
@@ -26,10 +26,10 @@ keo_solve_pars='--depth 11-20'
 
 def keo_get_date_obs(filename):
     fid_fit=fits.open(filename);
-    date_obs_str=fid_fit[0].header["DATE-OBS"]  
+    date_obs_str=fid_fit[0].header["DATE-OBS"]
     fid_fit.close()
     return datetime.datetime.strptime(date_obs_str,"%Y-%m-%dT%H:%M:%S")
-    
+
 def keo_crop(fname,fname2):
     hdulist = fits.open(fname,ignore_missing_end=True)
     img=hdulist[0].data
@@ -43,28 +43,28 @@ def keo_crop(fname,fname2):
 
 def keo_solve_field_altaz(fname, solve_pars, get_date_obs_fun=keo_get_date_obs,lat_deg=55.9305361,lon_deg=48.7444861,hei_m=91.):
     os_name=platform.system()
-    
+
     fname=os.path.abspath(fname)
-        
+
 #     print(fname)
     path, file = os.path.split(fname)
     spath=path+"/.temp"
     if not os.path.exists(spath):
         os.makedirs(spath)
-        
+
     crop_fname=spath+'/'+file.split('.')[-2]+'_crop.'+file.split('.')[-1]
     #print(crop_fname)
     keo_crop(fname,crop_fname)
-    
+
     if not os.path.exists(spath):
         os.makedirs(spath)
-        
+
     if os_name=='Windows':
         fname_cyg="/cygdrive/"+fname.replace(":","").replace("\\","/")
 #     print(fname)
     path, file = os.path.split(fname)
     spath=path+"/.temp"
-    
+
 #     correct_keo_xy(axy_fname);
     crop_fname_cyg="/cygdrive/"+crop_fname.replace(":","").replace("\\","/")
 #     com_line='cd ' + spath  + ' && solve-field ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
@@ -76,20 +76,20 @@ def keo_solve_field_altaz(fname, solve_pars, get_date_obs_fun=keo_get_date_obs,l
     err_code=os.system(com_line)
     if err_code!=0:
         return 2
-    
+
     site=EarthLocation(lat=lat_deg*u.deg, lon=lon_deg*u.deg, height=hei_m*u.m)
-        
+
     fname_xy=(crop_fname[0:-4]+'-indx.xyls').replace("\\","/")
     fname_rd=(crop_fname[0:-4]+'.rdls').replace("\\","/")
-    
+
 #     print(fname_xy)
-#     print(fname_rd)    
-    
+#     print(fname_rd)
+
     if Path(fname_rd).is_file()==False:
         return np.nan,np.nan,np.array([np.nan, np.nan, np.nan]),np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]),np.array([np.nan, np.nan, np.nan])
-        
+
 #     correct_keo_xyls(fname_xy)
-        
+
     date_obs=get_date_obs_fun(fname)
 
     hdulist = fits.open(fname_xy)
@@ -132,11 +132,11 @@ def keo_solve_field_altaz(fname, solve_pars, get_date_obs_fun=keo_get_date_obs,l
 
     az0=res_x[0];
     alt0=res_x[1];
-    
+
     a,b,c,d=arc_calc_pix2st_coefs((az0,alt0),AZ,ALT,X,Y)
 #     print(az0*180/np.pi,alt0*180/np.pi)
     az_c, alt_c = arc_pix2hor(255,255,az0,alt0,a,b)
-    print("Central pixel direction (AZ, ALT in deg):",az_c*180/np.pi,alt_c*180/np.pi)       
+    print("Central pixel direction (AZ, ALT in deg):",az_c*180/np.pi,alt_c*180/np.pi)
     return az0,alt0,az_c,alt_c,a,b,c,d
 
 def save_solve_data(fit_path,solve_fname):
