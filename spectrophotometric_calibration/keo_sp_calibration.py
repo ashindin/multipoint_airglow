@@ -364,59 +364,59 @@ def keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname=Non
     return png_prefix, len(fit_filenames), R_median
 
 fit_path="../data/140824/keo"
-movie_fname="keo_140824_calibration2.mp4"
+movie_fname="keo_140824_calibration.mp4"
 solve_pars_fname="../astrometric_calibration/keo_140824_solve.pars"
 masterdark_fname="keo_140824_masterdark.fit"
 save_fname="keo_140824_day.spcal"
 png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,area_rad=3,med_size=15)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[50:350]
-R_filt=R_filt[np.where(R_median>0)]
+R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
 R_std=np.std(R_filt)
 print(R_day, R_std)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] its std for 14/08/24:\n")
-fid.write(str(R_day)," ",str(R_std))
+fid.write(str(R_day)+" "+str(R_std))
 fid.close()
 
 
 # In[19]:
 
 fit_path="../data/140826/keo"
-movie_fname="keo_140826_calibration2.mp4"
+movie_fname="keo_140826_calibration.mp4"
 solve_pars_fname="../astrometric_calibration/keo_140826_solve.pars"
 masterdark_fname="keo_140826_masterdark.fit"
 save_fname="keo_140826_day.spcal"
 png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,area_rad=3,med_size=15)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[200:400]
-R_filt=R_filt[np.where(R_median>0)]
+R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
 R_std=np.std(R_filt)
 print(R_day, R_std)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] its std for 14/08/26:\n")
-fid.write(str(R_day)," ",str(R_std))
+fid.write(str(R_day)+" "+str(R_std))
 fid.close()
 
 
 # In[21]:
 
 fit_path="../data/160829/keo"
-movie_fname="keo_160829_calibration2.mp4"
+movie_fname="keo_160829_calibration.mp4"
 solve_pars_fname="../astrometric_calibration/keo_160829_solve.pars"
 masterdark_fname="keo_160829_masterdark.fit"
 save_fname="keo_160829_day.spcal"
 png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,area_rad=3,med_size=15)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[100:400]
-R_filt=R_filt[np.where(R_median>0)]
+R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
 R_std=np.std(R_filt)
 print(R_day, R_std)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] and its std for 16/08/29:\n")
-fid.write(str(R_day)," ",str(R_std))
+fid.write(str(R_day)+" "+str(R_std))
 fid.close()
 

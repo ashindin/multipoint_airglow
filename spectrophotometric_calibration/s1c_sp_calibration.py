@@ -377,27 +377,27 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
 # In[12]:
 
 fit_path="../data/140824/s1c"
-movie_fname="s1c_140824_calibration2.mp4"
+movie_fname="s1c_140824_calibration.mp4"
 solve_pars_fname="../astrometric_calibration/s1c_140824_solve.pars"
 masterdark_fname="s1c_140824_masterdark.fit"
 masterflat_fname="s1c_master.flat"
 save_fname="s1c_140824_day.spcal"
 png_prefix, num_frames, R_median = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
-R_filt=R_filt[np.where(R_median>0)]
+R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
 R_std=np.std(R_filt)
 print(R_day, R_std)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] its std for 14/08/24:\n")
-fid.write(str(R_day)," ",str(R_std))
+fid.write(str(R_day)+" "+str(R_std))
 fid.close()
 
 
 # In[13]:
 
 fit_path="../data/140826/s1c"
-movie_fname="s1c_140826_calibration2.mp4"
+movie_fname="s1c_140826_calibration.mp4"
 solve_pars_fname="../astrometric_calibration/s1c_140826_solve.pars"
 masterdark_fname="s1c_140826_masterdark.fit"
 masterflat_fname="s1c_master.flat"
@@ -405,12 +405,12 @@ save_fname="s1c_140826_day.spcal"
 png_prefix, num_frames, R_median = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[500::]
-R_filt=R_filt[np.where(R_median>0)]
+R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
 R_std=np.std(R_filt)
 print(R_day, R_std)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] and its std for 14/08/26:\n")
-fid.write(str(R_day)," ",str(R_std))
+fid.write(str(R_day)+" "+str(R_std))
 fid.close()
 

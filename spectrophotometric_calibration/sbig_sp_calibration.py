@@ -365,19 +365,19 @@ def sbig_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fn
 # In[6]:
 
 fit_path="../data/160829/sbig"
-movie_fname="sbig_160829_calibration2.mp4"
+movie_fname="sbig_160829_calibration.mp4"
 solve_pars_fname="../astrometric_calibration/sbig_160829_solve.pars"
 masterdark_fname="sbig_160829_masterdark.fit"
 masterflat_fname="sbig_master.flat"
 save_fname="sbig_160829_day.spcal"
 png_prefix, num_frames, R_median = sbig_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
-R_filt=R_filt[np.where(R_median>0)]
+R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
 R_std=np.std(R_filt)
 print(R_day, R_std)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] and its std for 16/08/29:\n")
-fid.write(str(R_day)," ",str(R_std))
+fid.write(str(R_day)+" "+str(R_std))
 fid.close()
 
