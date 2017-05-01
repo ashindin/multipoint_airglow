@@ -54,7 +54,7 @@ def get_solve_pars(save_fname):
     az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
     fid.close()
     return az0,alt0,a,b,c,d
-def make_movie_from_pngs(png_prefix, num_frames, movie_fname):    
+def make_movie_from_pngs(png_prefix, num_frames, movie_fname):
     com_line="ffmpeg -y -r 5 -f image2 -s 1280x720 -i " + png_prefix + "%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " +"-vframes "+ str(num_frames) +" "+ movie_fname
 #     print(com_line)
     os.system(com_line)
@@ -65,7 +65,7 @@ def make_movie_from_pngs(png_prefix, num_frames, movie_fname):
 
 cat_fname="SP_CATALOG.csv"
 NUM, BS_ID, RA, DEC, MAG, FLUX, SP_type = load_sp_catalog(cat_fname)
-dx=0.05   
+dx=0.05
 ms=10
 mew=1
 
@@ -80,11 +80,11 @@ np.set_printoptions(precision=1,linewidth=100,suppress=True)
 def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,save_fname=None,area_rad=4, med_size=31,lat_deg=56.1501667,lon_deg=46.1050833,hei_m=183.):
     if save_fname==None:
         save_fname=solve_pars_fname.split('/')[-1][0:-11]+'.spcal'
-    
+
     hdulist = fits.open(masterdark_fname,ignore_missing_end=True)
     masterdark=hdulist[0].data
     hdulist.close()
-    
+
     hdulist = fits.open(masterflat_fname,ignore_missing_end=True)
     masterflat=hdulist[0].data
     hdulist.close()
@@ -96,12 +96,12 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
     if not os.path.exists(spath):
         os.makedirs(spath)
     fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
-    
+
     R_median=np.zeros(len(fit_filenames))
     fig=plt.figure(figsize=(12.8,7.2))
     fig.set_size_inches(12.8, 7.2)
 
-#     ax=plt.axes(position=[0.035000000000000003+dx/2, 0.061764705882352888, 0.50624999999999998, 0.89999999999999991])   
+#     ax=plt.axes(position=[0.035000000000000003+dx/2, 0.061764705882352888, 0.50624999999999998, 0.89999999999999991])
     ax=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.50624999999999998, 0.7])
     plt.axis('off')
     ax1=plt.axes(position=[0.58205882352941185+dx, 0.71052941176470596-0.15, 0.35,0.4])
@@ -115,21 +115,21 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
     plt.grid(b=True)
     ax5=plt.axes(position=[0.035000000000000003+dx/2+0.38,0.04, 0.5/4, 0.7/4])
     plt.grid(b=True)
-    
+
     R_day=0
-    
+
     vrange=1000
     vshift=2000
-    
+
     alt_min=83*np.pi/180
 #     area_rad=3
 #     med_size=31
-    
+
     XX,YY=np.meshgrid(range(2*area_rad+1),range(2*area_rad+1))
-    
+
     fid=open(save_fname,'w')
     fid.write("# Camera calibration coefficients [Rayleighs per ADC unit] for each fit file:\n")
-    
+
     for i in range(len(fit_filenames)):
 #     for i in range(5):
 #     for i in range(58,59):
@@ -178,13 +178,13 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
         AZ_filt=AZ[filt_mask]
         X_filt=X[filt_mask]
         Y_filt=Y[filt_mask]
-        
+
         star_pixels=np.zeros(len(NUM_filt),dtype=int)
         star_adc=np.zeros(len(NUM_filt))
-                
+
         AREA=np.zeros((2*area_rad+1,2*area_rad+1,len(NUM_filt)))
         AREA0=np.zeros((2*area_rad+1,2*area_rad+1,len(NUM_filt)))
-        
+
         for j in range(len(NUM_filt)):
             sum_temp=0
             num=0
@@ -198,13 +198,13 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
 
             AREA[:,:,j]=np.copy(img_medfilt[int(Y_filt[j])-area_rad+y0-area_rad:int(Y_filt[j])+y0+1, int(X_filt[j])-area_rad+x0-area_rad:int(X_filt[j])+x0+1])
             AREA0[:,:,j]=np.copy(img0[int(Y_filt[j])-area_rad+y0-area_rad:int(Y_filt[j])+y0+1, int(X_filt[j])-area_rad+x0-area_rad:int(X_filt[j])+x0+1])
-            
+
             Rast=np.sqrt((XX-area_rad)**2+(YY-area_rad)**2)
-            
+
 #             print(Rast)
-            
+
             area=np.copy(AREA[:,:,j])
-            
+
             for k in range((2*area_rad+1)**2):
                 if Rast.flat[k]<=area_rad:
                     num+=1
@@ -215,16 +215,16 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
 #             print(AREA[:,:,j])
 #             print(" ")
 
-        
+
         # Catalog filtration 2
         filt_mask=np.zeros(len(NUM_filt),dtype=bool)
         for j in range(len(NUM_filt)):
             if np.max(AREA0[:,:,j])<0.9*max_img0:
                 filt_mask[j]=True
-                
+
         AREA_filt2=np.copy(AREA[:,:,filt_mask])
         AREA0_filt2=np.copy(AREA0[:,:,filt_mask])
-        
+
         NUM_filt2=NUM_filt[filt_mask]
         BS_ID_filt2=BS_ID_filt[filt_mask]
         RA_filt2=RA_filt[filt_mask]
@@ -243,7 +243,7 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
         for j in range(len(NUM_filt2)):
             sol_angle=tan_get_pixel_solid_angle(M_s1c,np.pi/2-ALT_filt2[j])
             br=get_brightness_in_Rayleighs(100,sol_angle,1,FLUX_filt2[j])
-            sa=star_adc_filt2[j]                        
+            sa=star_adc_filt2[j]
             R[j]=br/sa
 #             print('br[R]=', br, "; sa[ADC.u]=",sa,"; R=",R[j])
 
@@ -252,26 +252,26 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
         y2_bord=-np.sqrt(area_rad**2-(x_bord-area_rad)**2)+area_rad+0.5
 
         if len(NUM_filt2)>0:
-        
-            sort_ord=np.argsort(star_pixels_filt2)      
-        
+
+            sort_ord=np.argsort(star_pixels_filt2)
+
             plt.sca(ax3)
             idd=0
             area1=AREA_filt2[:,:,sort_ord[idd]]
             area1_max=np.max(AREA0_filt2[:,:,sort_ord[idd]])
             area1_id=BS_ID_filt2[sort_ord[idd]]
             plt.pcolormesh(area1, cmap="seismic",vmin=-1000, vmax=1000)
-    
+
             plt.plot(x_bord+0.5,y1_bord,'k-',lw=2)
             plt.plot(x_bord+0.5,y2_bord,'k-',lw=2)
-    
+
             plt.ylim(area_rad*2+1,0)
             plt.xlim(0,area_rad*2+1)
             plt.title(str(area1_id),loc='left',fontsize='smaller')
             plt.title(str(int(star_adc_filt2[sort_ord[idd]])),loc='right',fontsize='smaller')
             plt.title(str(int(R[sort_ord[idd]]*1000)/1000),fontsize='smaller')
             plt.ylabel(str(int(R[sort_ord[idd]]*star_adc_filt2[sort_ord[idd]])))
-        
+
             if len(NUM_filt2)>1:
                 plt.sca(ax4)
                 idd=1
@@ -279,10 +279,10 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
                 area2_max=np.max(AREA0_filt2[:,:,sort_ord[idd]])
                 area2_id=BS_ID_filt2[sort_ord[idd]]
                 plt.pcolormesh(area2, cmap="seismic",vmin=-1000, vmax=1000)
-                
+
                 plt.plot(x_bord+0.5,y1_bord,'k-',lw=2)
                 plt.plot(x_bord+0.5,y2_bord,'k-',lw=2)
-                
+
                 plt.ylim(area_rad*2+1,0)
                 plt.xlim(0,area_rad*2+1)
                 plt.title(str(area2_id),loc='left',fontsize='smaller')
@@ -296,10 +296,10 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
                 area3_max=np.max(AREA0_filt2[:,:,sort_ord[idd]])
                 area3_id=BS_ID_filt2[sort_ord[idd]]
                 plt.pcolormesh(area3, cmap="seismic",vmin=-1000, vmax=1000)
-                
+
                 plt.plot(x_bord+0.5,y1_bord,'k-',lw=2)
                 plt.plot(x_bord+0.5,y2_bord,'k-',lw=2)
-                
+
                 plt.ylim(area_rad*2+1,0)
                 plt.xlim(0,area_rad*2+1)
                 plt.title(str(area3_id),loc='left',fontsize='smaller')
@@ -307,13 +307,13 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
                 plt.title(str(int(R[sort_ord[idd]]*1000)/1000),fontsize='smaller')
                 plt.ylabel(str(int(R[sort_ord[idd]]*star_adc_filt2[sort_ord[idd]])))
 
-        
+
 
         # print(len(R),R)
         if len(R)>0:
             R_median[i]=np.median(R)
         #     print(R_median[i])
-        
+
         plt.sca(ax1)
         plt.plot([0, 50000], [R_median[i], R_median[i]], c='r', lw=2)
         plt.scatter(R*star_adc_filt2,R,s=np.pi*(star_adc_filt2/12000*7)**2)
@@ -362,15 +362,15 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
         ax1.clear()
         ax3.clear()
         ax4.clear()
-        ax5.clear()       
+        ax5.clear()
 
         fid.write(fit_fname.split('/')[-1] + " " + str(R_median[i]) + "\n")
-        
+
     plt.close()
-    sys.stdout.write('\n')    
+    sys.stdout.write('\n')
     sys.stdout.flush()
-    fid.close()    
-    
+    fid.close()
+
     return png_prefix, len(fit_filenames), R_median
 
 
@@ -384,11 +384,13 @@ masterflat_fname="s1c_master.flat"
 save_fname="s1c_140824_day.spcal"
 png_prefix, num_frames, R_median = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
-R_day=np.median(R_median[np.where(R_median>0)])
-print(R_day)
+R_filt=R_filt[np.where(R_median>0)]
+R_day=np.median(R_filt)
+R_std=np.std(R_filt)
+print(R_day, R_std)
 fid=open(save_fname,'w')
-fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] for 14/08/24:\n")
-fid.write(str(R_day))
+fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] its std for 14/08/24:\n")
+fid.write(str(R_day)," ",str(R_std))
 fid.close()
 
 
@@ -402,11 +404,13 @@ masterflat_fname="s1c_master.flat"
 save_fname="s1c_140826_day.spcal"
 png_prefix, num_frames, R_median = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
-R_filt=R_median[500::]
-R_day=np.median(R_filt[np.where(R_filt>0)])
-print(R_day)
+R_median=R_median[500::]
+R_filt=R_filt[np.where(R_median>0)]
+R_day=np.median(R_filt)
+R_std=np.std(R_filt)
+print(R_day, R_std)
 fid=open(save_fname,'w')
-fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] for 14/08/26:\n")
-fid.write(str(R_day))
+fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] and its std for 14/08/26:\n")
+fid.write(str(R_day)," ",str(R_std))
 fid.close()
 
