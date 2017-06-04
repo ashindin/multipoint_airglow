@@ -13,7 +13,7 @@ make
 make install  
 cd ..
 
-wget http://astrometry.net/downloads/astrometry.net-latest.tar.gz  
+wget http://astrometry.net/downloads/astrometry.net-0.70.tar.gz  
 tar -xvzf astrometry.net-latest.tar.gz  
 cd astrometry.net-0.70  
 cd util  

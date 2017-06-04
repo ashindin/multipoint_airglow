@@ -3,8 +3,8 @@ import subprocess
 import sys
 
 def main_script(python_cmd):
-	os.system(python_cmd+" crlf.py")
-    os.system(python_cmd+" download.py")
+    os.system(python_cmd+" crlf.py")
+    os.system(python_cmd+" download_data.py")
     os.system(python_cmd+" astrometric_calibration.py")
     os.system(python_cmd+" spectrophotometric_calibration.py")
 
@@ -24,7 +24,7 @@ minor_v=int(python_version_str.split('.')[2])
 
 if main_v==3 and major_v>=6:
     print("You have a correct python version (>=3.6)")
-	main_script(python_cmd)
+    main_script(python_cmd)
     sys.exit()
 else:
     python_cmd="python3"
@@ -35,7 +35,7 @@ else:
 
         if main_v==3 and major_v>=6:
             print("You have a correct python version")
-			main_script(python_cmd)
+            main_script(python_cmd)
             sys.exit()
         else:
             print("You don't have a correct python version (>=3.6)")

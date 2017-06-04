@@ -2,7 +2,7 @@
 
 The following instruction based on [this](https://sites.google.com/site/jmastronomy/Software/astrometry-net-setup) guide. Several things are updated.
 
-1. **Download Cygwin ([x86](https://www.cygwin.com/setup-x86.exe) or [x86_64](https://www.cygwin.com/setup-x86.exe)). Tested with version 2.877**
+1. **Download Cygwin ([x86](https://www.cygwin.com/setup-x86.exe) or [x86_64](https://www.cygwin.com/setup-x86_64.exe)). Tested with version 2.877**
 
 2. **Install Cygwin with following packages:**  
 Archive/bzip2  
@@ -44,14 +44,14 @@ pip install --no-deps astropy
 6. **Install CFITSIO:**  
 wget http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio_latest.tar.gz  
 tar -xvzf cfitsio_latest.tar.gz  
-cd cfitsio
+cd cfitsio  
 ./configure --prefix=/usr/local  
 make  
 make install  
 cd ~  
 
 7. **Install astrometry.net:**  
-wget http://astrometry.net/downloads/astrometry.net-latest.tar.gz  
+wget http://astrometry.net/downloads/astrometry.net-0.70.tar.gz  
 tar -xvzf astrometry.net-latest.tar.gz  
 cd astrometry.net-0.70  
 cd util  
@@ -76,3 +76,5 @@ wget http://data.astrometry.net/4100/index-4116.fits
 wget http://data.astrometry.net/4100/index-4117.fits  
 wget http://data.astrometry.net/4100/index-4118.fits  
 wget http://data.astrometry.net/4100/index-4119.fits  
+  
+10. Note that "bash" command in cmd.exe should execute cygwin's bash. Maybe Linux subsystem for Windows have to be uninstalled.  
