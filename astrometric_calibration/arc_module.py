@@ -69,6 +69,7 @@ def arc_pix2hor(x,y,az0,alt0,a,b):
     X=a[0]+a[1]*x+a[2]*y
     Y=b[0]+b[1]*x+b[2]*y
     
+    #AZ_I=np.arctan2(X,-Y)
     AZ_I=np.arctan2(X,-Y)
     R=np.sqrt(X**2+Y**2)
     
