@@ -1,0 +1,4 @@
+# Pumping scheme for 14/08/26: start timestamp [UT], duration  [minutes], period [minutes], number of periods, normalized amplitude, frequency [kHz]
+2016.08.29T17:31:00, 3, 6, 10, 1., 4300.
+2016.08.29T18:31:00, 9, 12, 1, .5, 4350.
+2016.08.29T18:43:00, 3, 6, 17, 1., 4350.
