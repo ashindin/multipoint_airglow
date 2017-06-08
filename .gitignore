@@ -19,3 +19,4 @@ spectrophotometric_calibration/__pycache__/
 spectrophotometric_calibration/*.mp4
 spectrophotometric_calibration/*.spcal
 image_processing/*.png
+image_processing/*.frames
