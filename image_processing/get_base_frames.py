@@ -5,7 +5,6 @@
 
 import datetime, os, copy
 import numpy as np
-import scipy.io as si
 
 
 # In[2]:

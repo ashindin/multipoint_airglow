@@ -34,7 +34,7 @@ def get_pumping_scheme_from_file(pumping_scheme_file):
     return pumping_scheme
 
 def get_photom_start_time(par_filename,ut_shift=-3):
-    fid=open(par_filename,'r')
+    fid=open(par_filename,'r', encoding='cp1251')
     s=fid.readline()[-21:-1]
     fid.close()    
     bin_filename=par_filename[0:-4]+".dat"
