@@ -20,3 +20,4 @@ spectrophotometric_calibration/*.mp4
 spectrophotometric_calibration/*.spcal
 image_processing/*.png
 image_processing/*.frames
+image_processing/s1c140824_glowfit
