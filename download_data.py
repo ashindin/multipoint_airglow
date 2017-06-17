@@ -43,12 +43,12 @@ def download_check_unpack_data():
 
 		directory="./data/140824/keo"
 		if not os.path.exists(directory):
-			os.makedirs(directory)
+			os.makedirs(directory+'/dark')
 		ret=os.system("tar xvjf "+filenames[0] +" -C "+ directory)
 		
 		directory="./data/140824/s1c"
 		if not os.path.exists(directory):
-			os.makedirs(directory)
+			os.makedirs(directory+'/dark')
 		ret+=os.system("tar xvjf "+filenames[1] +" -C "+ directory)
 		
 		directory="./data/140824/photometers"
@@ -58,7 +58,7 @@ def download_check_unpack_data():
 		
 		directory="./data/140826/s1c"
 		if not os.path.exists(directory):
-			os.makedirs(directory)
+			os.makedirs(directory+'/dark')
 		ret+=os.system("tar xvjf "+filenames[3] +" -C "+ directory)
 		
 		directory="./data/140826/photometers"
@@ -68,7 +68,7 @@ def download_check_unpack_data():
 		
 		directory="./data/140826/keo"
 		if not os.path.exists(directory):
-			os.makedirs(directory)
+			os.makedirs(directory+'/dark')
 		ret+=os.system("tar xvjf "+filenames[5] +" -C "+ directory)
 	  
 		directory="./data/160829/keo"
@@ -78,7 +78,7 @@ def download_check_unpack_data():
 			
 		directory="./data/160829/sbig"
 		if not os.path.exists(directory):
-			os.makedirs(directory)
+			os.makedirs(directory+'/dark')
 		ret+=os.system("tar xvjf "+filenames[7] +" -C "+ directory)
 		
 		directory="./data/160829/hf"

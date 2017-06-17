@@ -14,7 +14,7 @@ make install
 cd ..
 
 wget http://astrometry.net/downloads/astrometry.net-0.70.tar.gz  
-tar -xvzf astrometry.net-latest.tar.gz  
+tar -xvzf astrometry.net-0.70.tar.gz  
 cd astrometry.net-0.70  
 cd util  
 echo NETPBM_INC ?= -I /usr/include/netpbm > makefile.netpbm  
