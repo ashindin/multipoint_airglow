@@ -9,7 +9,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 import scipy.optimize as so
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 os_name=platform.system()
 
 import warnings
@@ -18,6 +18,11 @@ warnings.simplefilter('ignore', category=AstropyWarning)
 
 from arc_module import *
 from save_solve_pars import *
+
+if os_name=='Windows':
+    solve_field_path='/usr/local/astrometry/bin/solve-field'
+else:
+    solve_field_path='solve-field'
 
 win_com_prefix='bash --login -c "('
 win_com_postfix=')"'
@@ -68,7 +73,7 @@ def keo_solve_field_altaz(fname, solve_pars, get_date_obs_fun=keo_get_date_obs,l
 #     correct_keo_xy(axy_fname);
     crop_fname_cyg="/cygdrive/"+crop_fname.replace(":","").replace("\\","/")
 #     com_line='cd ' + spath  + ' && solve-field ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
-    com_line='/usr/local/astrometry/bin/solve-field ' + '--overwrite '  + solve_pars + ' --sigma 50 --crpix-center --cpulimit 2 --no-plots -M none -S none -B none -W none ' + crop_fname_cyg
+    com_line= solve_field_path + ' ' + '--overwrite '  + solve_pars + ' --sigma 50 --crpix-center --cpulimit 2 --no-plots -M none -S none -B none -W none ' + crop_fname_cyg
 
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
