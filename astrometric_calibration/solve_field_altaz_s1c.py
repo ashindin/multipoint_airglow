@@ -25,7 +25,7 @@ else:
     solve_field_path='solve-field'
 
 
-win_com_prefix='bash --login -c "(/usr/local/astrometry/bin/'
+win_com_prefix='bash --login -c "('
 win_com_postfix=')"'
 s1c_solve_pars='--scale-units arcsecperpix --scale-low 250 --scale-high 270'
 
@@ -83,7 +83,7 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     com_line='cd ' + spath  + ' && ' + solve_field_path + ' ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
-#     print(com_line)
+    print(com_line)
     err_code=os.system(com_line)
     if err_code!=0:
         return 2
