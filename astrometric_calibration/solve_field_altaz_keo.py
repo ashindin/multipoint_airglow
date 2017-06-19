@@ -73,7 +73,10 @@ def keo_solve_field_altaz(fname, solve_pars, get_date_obs_fun=keo_get_date_obs,l
 #     correct_keo_xy(axy_fname);
     crop_fname_cyg="/cygdrive/"+crop_fname.replace(":","").replace("\\","/")
 #     com_line='cd ' + spath  + ' && solve-field ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
-    com_line= solve_field_path + ' ' + '--overwrite '  + solve_pars + ' --sigma 50 --crpix-center --cpulimit 2 --no-plots -M none -S none -B none -W none ' + crop_fname_cyg
+    if os_name=='Windows':
+        com_line= solve_field_path + ' ' + '--overwrite '  + solve_pars + ' --sigma 50 --crpix-center --cpulimit 2 --no-plots -M none -S none -B none -W none ' + crop_fname_cyg
+    else:
+        com_line= solve_field_path + ' ' + '--overwrite '  + solve_pars + ' --sigma 50 --crpix-center --cpulimit 2 --no-plots -M none -S none -B none -W none ' + crop_fname
 
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
