@@ -33,6 +33,14 @@ from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 
 # In[4]:
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib import dates
+
+
+# In[5]:
+
 def s1c_get_date_obs(filename,ut_shift=-3):
     fdt=open(filename,'r',errors = 'ignore')
     fdt.seek(8*80)
@@ -78,101 +86,48 @@ def get_spcal_day_coefs(spcal_day_fname):
     spcal_std=float(lines_list[1])
     return spcal_coef, spcal_std
 
+def get_pumping_scheme_from_file(pumping_scheme_file):
+    pumping_scheme=[]
+    fid=open(pumping_scheme_file,'r')
+    lines=fid.readlines()[1::]
+    lines2=[]
+    for line in lines:
+        if line[-1]=='\n':
+            lines2.append(line[:-1])
+        else:
+            lines2.append(line)
+        line_list=lines2[-1].split(',')
+        pumping_scheme.append([datetime.datetime.strptime(line_list[0], "%Y.%m.%dT%H:%M:%S"),float(line_list[1]),float(line_list[2]),float(line_list[3]),float(line_list[4]),float(line_list[5])])
+    fid.close()
+    return pumping_scheme
 
-# In[18]:
-
-s1c_fit_path="../data/140824/s1c"
-base_frames_fname="s1c_140824_base.frames"
-solve_pars_fname="../astrometric_calibration/s1c_140824_solve.pars"
-s1c_spcal_day_fname = "../spectrophotometric_calibration/s1c_140824_day.spcal"
-masterdark_fname="../spectrophotometric_calibration/s1c_140824_masterdark.fit"
-masterflat_fname="../spectrophotometric_calibration/s1c_master.flat"
-lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
-lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
-hei_cam=183.;
-CAM_site=EarthLocation(lat=lat_cam_deg*u.deg, lon=lon_cam_deg*u.deg, height=hei_cam*u.m)
-avr_width1=11
-avr_width2=59
-interp_deg=2 # three points
-
-
-# In[6]:
-
-s1c_spcal_day_coef, s1c_spcal_std=get_spcal_day_coefs(s1c_spcal_day_fname)   
-
-
-# In[7]:
-
-spath="./s1c140824_glowfit/"
-if not os.path.exists(spath):
-    os.makedirs(spath)
-
-
-# In[8]:
-
-hdulist = fits.open(masterdark_fname,ignore_missing_end=True)
-masterdark=hdulist[0].data
-hdulist.close()
-hdulist = fits.open(masterflat_fname,ignore_missing_end=True)
-masterflat=hdulist[0].data
-hdulist.close()
-
-
-# In[9]:
-
-masterdark.shape
-
-
-# In[10]:
-
-fid=open(base_frames_fname,'r')
-lines=fid.readlines()
-fid.close()
-base_frames=[]
-for i in range(len(lines)):
-    if lines[i]!='\n':               
-        base_frames.append(lines[i][0:-1])
-s1c_fit_filenames=sorted([s1c_fit_path+'/'+fn for fn in next(os.walk(s1c_fit_path))[2]])
-base_frames_fullnames=[s1c_fit_path + "/" + bf_name for bf_name in base_frames]
-
-
-# In[11]:
-
-fr_inds=list(range(len(s1c_fit_filenames)))
-bf_inds=[]
-bf_dates=[]
-bf_x_dates=[]
-for bfn in base_frames_fullnames:
-    for i in fr_inds:
-        if bfn==s1c_fit_filenames[i]:
-            bf_inds.append(i)
-    bf_dates.append(s1c_get_date_obs(bfn,-4)+datetime.timedelta(seconds=s1c_get_exp_sec(bfn)/2))
-    bf_x_dates.append(dates.date2num(bf_dates[-1]))
-bf_inds_local=list(range(len(bf_inds)))
-# bf_dates
-
-
-# In[12]:
-
-BF_imgs=np.zeros((masterdark.shape[0],masterdark.shape[1],len(base_frames_fullnames)))
-for i in range(len(base_frames_fullnames)):
-#     sys.stdout.write('\r')
-#     sys.stdout.write("Add base frame "+str(i+1)+"/"+str(len(base_frames_fullnames)))
-#     sys.stdout.flush()
-    bf_fname=base_frames_fullnames[i]
-    hdulist = fits.open(bf_fname,ignore_missing_end=True)
-    BF_imgs[:,:,i]=hdulist[0].data.astype('float')
-    hdulist.close()
-    BF_imgs[:,:,i]=(BF_imgs[:,:,i]-masterdark.astype('float'))/masterflat.astype('float')
-    BF_imgs[:,:,i]=ss.medfilt(BF_imgs[:,:,i],kernel_size=avr_width1)
-
-
-# In[13]:
-
-YPIX, XPIX = np.mgrid[1:BF_imgs[:,:0].shape[0]+1, 1:BF_imgs[:,:,0].shape[1]+1]
-
-
-# In[14]:
+def make_clean_pumping_scheme(pumping_scheme):
+    clean_pumping=[]
+    date_axe=[]
+    x_dates=[]
+    for ps in pumping_scheme:
+        st_time=ps[0]
+        tau=ps[1]
+        T=ps[2]
+        num_p=ps[3]
+        
+        num_sec=int(T*num_p*60)
+        date_axe_ps=[st_time+datetime.timedelta(seconds=i) for i in range(-1,num_sec)]
+        x_dates_ps=dates.date2num(date_axe_ps)
+        
+        duty_frac=tau/T
+        pump=np.zeros(num_sec+1)
+        for i in range(-1,num_sec):
+            min_float=i/60;
+            period_float=i/(T*60)
+            period_offset=period_float-int(period_float)
+            if period_offset<=duty_frac and period_offset>0:
+                pump[i]=ps[4]
+                
+        clean_pumping.append(pump)
+        date_axe.append(date_axe_ps)
+        x_dates.append(x_dates_ps)
+    return date_axe, x_dates, clean_pumping
 
 def shift_img(img_base, base_time, obs_time):
     AZ=np.zeros_like(img_base)
@@ -206,12 +161,129 @@ def shift_img(img_base, base_time, obs_time):
     return img_mod;
 
 
+# In[6]:
+
+s1c_fit_path="../data/140824/s1c"
+base_frames_fname="s1c_140824_base.frames"
+solve_pars_fname="../astrometric_calibration/s1c_140824_solve.pars"
+s1c_spcal_day_fname = "../spectrophotometric_calibration/s1c_140824_day.spcal"
+s1c_spcal_fname = "../spectrophotometric_calibration/s1c_140824.spcal"
+masterdark_fname="../spectrophotometric_calibration/s1c_140824_masterdark.fit"
+masterflat_fname="../spectrophotometric_calibration/s1c_master.flat"
+lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
+lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
+hei_cam=183.;
+CAM_site=EarthLocation(lat=lat_cam_deg*u.deg, lon=lon_cam_deg*u.deg, height=hei_cam*u.m)
+avr_width1=11
+avr_width2=59
+interp_deg=2 # three points
+
+
+# In[7]:
+
+s1c_spcal_day_coef, s1c_spcal_std=get_spcal_day_coefs(s1c_spcal_day_fname)
+s1c_spcal_day_coef, s1c_spcal_std
+
+
+# In[8]:
+
+fid=open(s1c_spcal_fname,'r')
+lines=fid.readlines()
+spcal_fnames=[]
+spcal_coefs=[]
+for i in range(1,len(lines)):
+    line_list=lines[i][:-1].split(' ')
+    spcal_fnames.append(line_list[0])
+    spcal_coefs.append(float(line_list[1]))
+fid.close()
+
+
+# In[9]:
+
+spath="./s1c140824_glowfit/"
+if not os.path.exists(spath):
+    os.makedirs(spath)
+
+
+# In[10]:
+
+hdulist = fits.open(masterdark_fname,ignore_missing_end=True)
+masterdark=hdulist[0].data
+hdulist.close()
+hdulist = fits.open(masterflat_fname,ignore_missing_end=True)
+masterflat=hdulist[0].data
+hdulist.close()
+
+
+# In[11]:
+
+fid=open(base_frames_fname,'r')
+lines=fid.readlines()
+fid.close()
+base_frames=[]
+for i in range(len(lines)):
+    if lines[i]!='\n':               
+        base_frames.append(lines[i][0:-1])
+s1c_fit_filenames=sorted([s1c_fit_path+'/'+fn for fn in next(os.walk(s1c_fit_path))[2]])
+base_frames_fullnames=[s1c_fit_path + "/" + bf_name for bf_name in base_frames]
+
+
+# In[12]:
+
+fr_inds=list(range(len(s1c_fit_filenames)))
+bf_inds=[]
+bf_dates=[]
+bf_x_dates=[]
+for bfn in base_frames_fullnames:
+    for i in fr_inds:
+        if bfn==s1c_fit_filenames[i]:
+            bf_inds.append(i)
+    bf_dates.append(s1c_get_date_obs(bfn,-4)+datetime.timedelta(seconds=s1c_get_exp_sec(bfn)/2))
+    bf_x_dates.append(dates.date2num(bf_dates[-1]))
+bf_inds_local=list(range(len(bf_inds)))
+# bf_dates
+
+
+# In[13]:
+
+# BF_imgs=np.zeros((masterdark.shape[0],masterdark.shape[1],len(base_frames_fullnames)))
+BF_imgs=[]
+for i in range(len(base_frames_fullnames)):
+#     sys.stdout.write('\r')
+#     sys.stdout.write("Add base frame "+str(i+1)+"/"+str(len(base_frames_fullnames)))
+#     sys.stdout.flush()
+    bf_fname=base_frames_fullnames[i]
+    hdulist = fits.open(bf_fname,ignore_missing_end=True)
+#     BF_imgs[:,:,i]=hdulist[0].data.astype('float')
+    BF_imgs.append(hdulist[0].data.astype('float'))
+    hdulist.close()
+#     BF_imgs[:,:,i]=(BF_imgs[:,:,i]-masterdark.astype('float'))/masterflat.astype('float')
+#     BF_imgs[:,:,i]=ss.medfilt(BF_imgs[:,:,i],kernel_size=avr_width1)
+    BF_imgs[-1]=(BF_imgs[-1]-masterdark.astype('float'))/masterflat.astype('float')
+    BF_imgs[-1]=ss.medfilt(BF_imgs[-1],kernel_size=avr_width1)
+
+
+# In[14]:
+
+# YPIX, XPIX = np.mgrid[1:BF_imgs[:,:,0].shape[0]+1, 1:BF_imgs[:,:,0].shape[1]+1]
+YPIX, XPIX = np.mgrid[1:BF_imgs[0].shape[0]+1, 1:BF_imgs[0].shape[1]+1]
+
+
 # In[15]:
 
 az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
 
 
-# In[48]:
+# In[16]:
+
+pumping_scheme_file="pump140824.scheme"
+prohibited_area_min=2.
+pumping_scheme=get_pumping_scheme_from_file(pumping_scheme_file)
+pumping_scheme_list = [', '.join((ps[0].strftime('%Y-%m-%dT%H:%M:%S'),str(ps[1]) + ' min',str(ps[2])+' min',str(ps[3]),str(ps[4]),str(ps[5])+' kHz')) for ps in pumping_scheme]
+date_axe_clean, x_dates_clean, clean_pumping = make_clean_pumping_scheme(pumping_scheme)
+
+
+# In[40]:
 
 left_bf_ind=0
 right_bf_ind=0
@@ -226,8 +298,12 @@ for i in range(bf_inds[0],bf_inds[-1]):
     bfdx_locals=[]
     fn=s1c_fit_filenames[i]
     f_exp=s1c_get_exp_sec(fn)
-    f_date=s1c_get_date_obs(fn,-4)+datetime.timedelta(seconds=f_exp/2)
+    f_date_start=s1c_get_date_obs(fn,-4)
+    f_date=f_date_start+datetime.timedelta(seconds=f_exp/2)
+    f_date_end=f_date_start+datetime.timedelta(seconds=f_exp)
+    f_x_date_start=dates.date2num(f_date_start)
     f_x_date=dates.date2num(f_date)
+    f_x_date_end=dates.date2num(f_date_end)
     if i in bf_inds: continue;
     for j in bf_inds_local:
         if f_x_date>bf_x_dates[j]:
@@ -256,20 +332,96 @@ for i in range(bf_inds[0],bf_inds[-1]):
             bfl_locals.insert(0,left_bf_ind-j-1)
 #     print(i," - ", bf_locals,bfl_locals, bfdx_locals)
 
+    fn_split=fn.split('/')[-1]
+    for j in range(len(spcal_fnames)):
+        if fn_split==spcal_fnames[j]:
+            sp_coef=spcal_coefs[j]
+            sp_offset=abs(s1c_spcal_day_coef-sp_coef)/s1c_spcal_std
+    
     y=[]
     for j in range(len(bfl_locals)):
-        y.append(shift_img(BF_imgs[:,:,bfl_locals[j]],bfd_locals[j],f_date))
+        y.append(shift_img(BF_imgs[bfl_locals[j]],bfd_locals[j],f_date))
     
     det=bfdx_locals[0]**2*bfdx_locals[1]+bfdx_locals[2]**2*bfdx_locals[0]+bfdx_locals[1]**2*bfdx_locals[2]-bfdx_locals[2]**2*bfdx_locals[1]-bfdx_locals[1]**2*bfdx_locals[0]-bfdx_locals[0]**2*bfdx_locals[2]
     dark=(bfdx_locals[0]**2*bfdx_locals[1]*y[2]+bfdx_locals[2]**2*bfdx_locals[0]*y[1]+bfdx_locals[1]**2*bfdx_locals[2]*y[0]
         -bfdx_locals[2]**2*bfdx_locals[1]*y[0]-bfdx_locals[1]**2*bfdx_locals[0]*y[2]-bfdx_locals[0]**2*bfdx_locals[2]*y[1])/det
     
+    f_date_iso=f_date_start.strftime('%Y-%m-%dT%H:%M:%S')
+    
+    hdu_dark = fits.PrimaryHDU(dark*s1c_spcal_day_coef)
+    hdu_dark.header['DATE-OBS']=f_date_iso
+    hdu_dark.header['BITPIX']=-64
+    hdu_dark.header['EXPTIME']=f_exp
+    hdu_dark.header['MED-WID1']=avr_width1
+    hdulist_dark = fits.HDUList([hdu_dark])
+    hdulist_dark.writeto(spath+fn.split('/')[-1].split('.')[-2]+"_dark.fit",overwrite=True)
+    
     hdulist = fits.open(fn,ignore_missing_end=True)
     img=hdulist[0].data.astype('float')
     img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * s1c_spcal_day_coef
-    hdulist[0].data=img
-    hdulist[0].header['BITPIX']=-64
-    hdulist[0].header['EXPTIME']=f_exp
-    hdulist.writeto(spath+fn.split('/')[-1],overwrite=True,output_verify='fix')
-    hdulist.close()  
+
+    hdu_light = fits.PrimaryHDU(img)
+    hdu_light.header['DATE-OBS']=f_date_iso
+    hdu_light.header['BITPIX']=-64
+    hdu_light.header['EXPTIME']=f_exp
+    hdu_light.header['SPCAL-DC']=s1c_spcal_day_coef
+    hdu_light.header['SPCAL-DS']=s1c_spcal_std
+    hdu_light.header['SPCAL-C']=sp_coef
+    hdu_light.header['SPCAL-O']=sp_offset
+    hdu_light.header['MED-WID1']=avr_width1
+    hdu_light.header['MED-WID2']=avr_width2
+    for j in range(len(pumping_scheme_list)):        
+        hdu_light.header['P-SCH-'+str(j)]=pumping_scheme_list[j]
+        
+    hdulist_light = fits.HDUList([hdu_light])
+    hdulist_light.writeto(spath+fn.split('/')[-1].split('.')[-2]+".fit",overwrite=True)
+    
+    # plotting
+    fig=plt.figure(figsize=(12.8,7.2))
+    fig.set_size_inches(12.8, 7.2)
+    dx=0.05
+    ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
+    pcm1=plt.pcolormesh(img,vmin=-20,vmax=20)
+
+    ax1.set_ylim(288,0)
+    plt.title('LIGHT',loc='left')
+    plt.title(f_date_iso,loc='right')
+
+    ax1_cb=plt.axes(position=[0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
+    plt.colorbar(pcm1,ax1_cb)
+
+    ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
+    med=np.median(dark*s1c_spcal_day_coef)
+    pcm2=plt.pcolormesh(dark*s1c_spcal_day_coef,vmin=med-100,vmax=med+100)
+    # plt.colorbar()
+    ax2.set_ylim(288,0)
+    coefs_title=' '.join(("{:4.2f}".format(s1c_spcal_day_coef), 
+                          "{:5.3f}".format(s1c_spcal_std), 
+                          "{:4.2f}".format(sp_coef), 
+                          "{:4.2f}".format(sp_offset)))
+    plt.title("SUBSTRACT",loc='left')
+    plt.title("SP_CAL: " + coefs_title + "; MED=" + str(int(med)),loc='right')
+
+    ax2_cb=plt.axes(position=[0.485+0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
+    plt.colorbar(pcm2,ax2_cb)
+
+    ax3=plt.axes(position=[0.035000000000000003+dx/2, 0.05, 0.907, 0.17])
+
+    xlim_left=f_x_date_start-12/60/24
+    xlim_right=f_x_date_start+12/60/24
+    ax3.set_xlim(xlim_left,xlim_right)
+    ax3.set_ylim(0,1.)
+    ax3.xaxis.set_major_locator(dates.MinuteLocator(byminute=range(1,61,3)))
+    ax3.xaxis.set_minor_locator(dates.MinuteLocator(byminute=range(4,64,3)))
+    xfmt = dates.DateFormatter('%H:%M')
+    ax3.xaxis.set_major_formatter(xfmt)
+    for i in range(len(clean_pumping)):
+        plt.plot(x_dates_clean[i],clean_pumping[i]*0.9,'r')
+
+    plt.plot([f_x_date_start, f_x_date_end],[0.95,0.95],'b',lw=3)
+    plt.grid()
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
+
+    plt.savefig(spath+fn.split('/')[-1].split('.')[-2]+".png")
+    plt.close()
 
