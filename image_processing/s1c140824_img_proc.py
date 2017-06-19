@@ -333,6 +333,8 @@ for i in range(bf_inds[0],bf_inds[-1]):
 #     print(i," - ", bf_locals,bfl_locals, bfdx_locals)
 
     fn_split=fn.split('/')[-1]
+    sp_coef=0.
+    sp_offset=0.
     for j in range(len(spcal_fnames)):
         if fn_split==spcal_fnames[j]:
             sp_coef=spcal_coefs[j]
