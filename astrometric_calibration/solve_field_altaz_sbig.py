@@ -1,6 +1,6 @@
 import datetime
 import time
-import subprocess
+#import subprocess
 import os
 import platform
 from pathlib import Path
@@ -9,7 +9,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 import scipy.optimize as so
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 os_name=platform.system()
 
 import warnings
@@ -18,6 +18,11 @@ warnings.simplefilter('ignore', category=AstropyWarning)
 
 from tan_module import *
 from save_solve_pars import *
+
+if os_name=='Windows':
+    solve_field_path='/usr/local/astrometry/bin/solve-field'
+else:
+    solve_field_path='solve-field'
 
 win_com_prefix='bash --login -c "('
 win_com_postfix=')"'
@@ -65,7 +70,7 @@ def sbig_solve_field_altaz(fname, solve_pars, get_date_obs_fun=sbig_get_date_obs
     if err_code!=0:
         return 1
     
-    com_line='cd ' + spath  + ' && /usr/local/astrometry/bin/solve-field ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
+    com_line='cd ' + spath  + ' && ' + solve_field_path + ' ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
 #     print(com_line)
