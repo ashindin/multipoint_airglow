@@ -9,7 +9,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 import scipy.optimize as so
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 os_name=platform.system()
 
 import warnings
@@ -19,7 +19,13 @@ warnings.simplefilter('ignore', category=AstropyWarning)
 from tan_module import *
 from save_solve_pars import *
 
-win_com_prefix='bash --login -c "('
+if os_name=='Windows':
+    solve_field_path='/usr/local/astrometry/bin/solve-field'
+else:
+    solve_field_path='solve-field'
+
+
+win_com_prefix='bash --login -c "(/usr/local/astrometry/bin/'
 win_com_postfix=')"'
 s1c_solve_pars='--scale-units arcsecperpix --scale-low 250 --scale-high 270'
 
@@ -44,10 +50,10 @@ def image2xy(fname, out_dir):
 #         os.makedirs(out_dir)
     name=fname.split('/')[-1]
     out_name=out_dir + '/' + name.split('.')[-2] + '.axy'
-    com_line='/usr/local/astrometry/bin/image2xy -O -o ' + out_name +' ' + fname
+    com_line='image2xy -O -o ' + out_name +' ' + fname
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
-#     print(com_line)
+    #print(com_line)
     return  os.system(com_line), out_name
 # image2xy(fname, spath)
 
@@ -74,7 +80,7 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     if err_code!=0:
         return 1
 
-    com_line='cd ' + spath  + ' && /usr/local/astrometry/bin/solve-field ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
+    com_line='cd ' + spath  + ' && ' + solve_field_path + ' ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
 #     print(com_line)
