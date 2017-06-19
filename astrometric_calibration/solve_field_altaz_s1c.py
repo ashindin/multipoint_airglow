@@ -21,8 +21,10 @@ from save_solve_pars import *
 
 if os_name=='Windows':
     solve_field_path='/usr/local/astrometry/bin/solve-field'
+    image2xypath='/usr/local/astrometry/bin/image2xy'
 else:
     solve_field_path='solve-field'
+    image2xy='image2xy'
 
 
 win_com_prefix='bash --login -c "('
@@ -50,7 +52,7 @@ def image2xy(fname, out_dir):
 #         os.makedirs(out_dir)
     name=fname.split('/')[-1]
     out_name=out_dir + '/' + name.split('.')[-2] + '.axy'
-    com_line='image2xy -O -o ' + out_name +' ' + fname
+    com_line=image2xypath +' -O -o ' + out_name +' ' + fname
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
     #print(com_line)
@@ -83,7 +85,7 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     com_line='cd ' + spath  + ' && ' + solve_field_path + ' ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
-    print(com_line)
+    #print(com_line)
     err_code=os.system(com_line)
     if err_code!=0:
         return 2
