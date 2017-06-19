@@ -24,7 +24,7 @@ if os_name=='Windows':
     image2xypath='/usr/local/astrometry/bin/image2xy'
 else:
     solve_field_path='solve-field'
-    image2xy='image2xy'
+    image2xypath='image2xy'
 
 win_com_prefix='bash --login -c "('
 win_com_postfix=')"'
