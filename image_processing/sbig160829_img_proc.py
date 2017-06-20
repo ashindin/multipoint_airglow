@@ -227,7 +227,7 @@ for bfn in base_frames_fullnames:
     for i in fr_inds:
         if bfn==sbig_fit_filenames[i]:
             bf_inds.append(i)
-    bf_dates.append(sbig_get_date_obs(bfn,-4)+datetime.timedelta(seconds=sbig_get_exp_sec(bfn)/2))
+    bf_dates.append(sbig_get_date_obs(bfn)+datetime.timedelta(seconds=sbig_get_exp_sec(bfn)/2))
     bf_x_dates.append(dates.date2num(bf_dates[-1]))
 bf_inds_local=list(range(len(bf_inds)))
 # bf_dates
@@ -287,7 +287,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
     bfdx_locals=[]
     fn=sbig_fit_filenames[i]
     f_exp=sbig_get_exp_sec(fn)
-    f_date_start=sbig_get_date_obs(fn,-4)
+    f_date_start=sbig_get_date_obs(fn)
     f_date=f_date_start+datetime.timedelta(seconds=f_exp/2)
     f_date_end=f_date_start+datetime.timedelta(seconds=f_exp)
     f_x_date_start=dates.date2num(f_date_start)
