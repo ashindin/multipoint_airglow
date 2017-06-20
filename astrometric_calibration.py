@@ -8,7 +8,7 @@ def main_script(python_cmd):
     os.system(python_cmd+" solve_field_altaz_sbig.py")
     os.system(python_cmd+" solve_cam_direction_plot.py")
     os.system(python_cmd+" exam_solve_pars_s1c.py")
-    os.system(python_cmd+" python exam_solve_pars_keo.py")
+    os.system(python_cmd+" exam_solve_pars_keo.py")
     os.system(python_cmd+" exam_solve_pars_sbig.py")
 
 os.chdir('./astrometric_calibration/')
