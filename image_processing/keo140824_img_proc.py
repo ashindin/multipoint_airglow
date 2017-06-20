@@ -162,8 +162,8 @@ lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
 lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
 hei_cam=183.;
 CAM_site=EarthLocation(lat=lat_cam_deg*u.deg, lon=lon_cam_deg*u.deg, height=hei_cam*u.m)
-avr_width1=11
-avr_width2=59
+avr_width1=3
+avr_width2=15
 interp_deg=2 # three points
 
 
