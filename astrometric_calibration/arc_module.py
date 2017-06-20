@@ -78,10 +78,10 @@ def arc_pix2hor(x,y,az0,alt0,a,b):
     AZ=az0+np.arctan2(-np.cos(ALT_I)*np.sin(AZ_I),
     np.sin(ALT_I)*np.cos(alt0)-np.cos(ALT_I)*np.sin(alt0)*np.cos(AZ_I))
     
-    if AZ>2*np.pi:
-        AZ-=2*np.pi    
-    if AZ<0:
-        AZ+=2*np.pi    
+    #if AZ>2*np.pi:
+    #    AZ-=2*np.pi    
+    #if AZ<0:
+    #    AZ+=2*np.pi    
     
     ALT=np.arcsin(np.sin(ALT_I)*np.sin(alt0)+np.cos(ALT_I)*np.cos(alt0)*np.cos(AZ_I))    
     return AZ, ALT
