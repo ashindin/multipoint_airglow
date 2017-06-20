@@ -158,7 +158,6 @@ solve_pars_fname="../astrometric_calibration/keo_140824_solve.pars"
 keo_spcal_day_fname = "../spectrophotometric_calibration/keo_140824_day.spcal"
 keo_spcal_fname = "../spectrophotometric_calibration/keo_140824.spcal"
 masterdark_fname="../spectrophotometric_calibration/keo_140824_masterdark.fit"
-masterflat_fname="../spectrophotometric_calibration/keo_master.flat"
 lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
 lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
 hei_cam=183.;
@@ -198,9 +197,6 @@ if not os.path.exists(spath):
 
 hdulist = fits.open(masterdark_fname,ignore_missing_end=True)
 masterdark=hdulist[0].data
-hdulist.close()
-hdulist = fits.open(masterflat_fname,ignore_missing_end=True)
-masterflat=hdulist[0].data
 hdulist.close()
 
 
@@ -246,9 +242,7 @@ for i in range(len(base_frames_fullnames)):
 #     BF_imgs[:,:,i]=hdulist[0].data.astype('float')
     BF_imgs.append(hdulist[0].data.astype('float'))
     hdulist.close()
-#     BF_imgs[:,:,i]=(BF_imgs[:,:,i]-masterdark.astype('float'))/masterflat.astype('float')
-#     BF_imgs[:,:,i]=ss.medfilt(BF_imgs[:,:,i],kernel_size=avr_width1)
-    BF_imgs[-1]=(BF_imgs[-1]-masterdark.astype('float'))/masterflat.astype('float')
+    BF_imgs[-1]=(BF_imgs[-1]-masterdark.astype('float'))
     BF_imgs[-1]=ss.medfilt(BF_imgs[-1],kernel_size=avr_width1)
 
 
@@ -349,7 +343,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
 
     hdulist = fits.open(fn,ignore_missing_end=True)
     img=hdulist[0].data.astype('float')
-    img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * keo_spcal_day_coef
+    img=ss.medfilt((img-masterdark.astype('float')) - dark,kernel_size=avr_width2) * keo_spcal_day_coef
 
     hdu_light = fits.PrimaryHDU(img)
     hdu_light.header['DATE-OBS']=f_date_iso

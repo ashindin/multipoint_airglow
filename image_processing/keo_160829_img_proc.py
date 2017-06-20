@@ -152,12 +152,12 @@ def shift_img(img_base, base_time, obs_time):
 
 # In[6]:
 
-keo_fit_path="../data/140826/keo"
-base_frames_fname="keo_140826_base.frames"
-solve_pars_fname="../astrometric_calibration/keo_140826_solve.pars"
-keo_spcal_day_fname = "../spectrophotometric_calibration/keo_140826_day.spcal"
-keo_spcal_fname = "../spectrophotometric_calibration/keo_140826.spcal"
-masterdark_fname="../spectrophotometric_calibration/keo_140826_masterdark.fit"
+keo_fit_path="../data/160829/keo"
+base_frames_fname="keo_160829_base.frames"
+solve_pars_fname="../astrometric_calibration/keo_160829_solve.pars"
+keo_spcal_day_fname = "../spectrophotometric_calibration/keo_160829_day.spcal"
+keo_spcal_fname = "../spectrophotometric_calibration/keo_160829.spcal"
+masterdark_fname="../spectrophotometric_calibration/keo_160829_masterdark.fit"
 lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
 lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
 hei_cam=183.;
@@ -188,7 +188,7 @@ fid.close()
 
 # In[9]:
 
-spath="./keo140826_glowfit/"
+spath="./keo160829_glowfit/"
 if not os.path.exists(spath):
     os.makedirs(spath)
 
@@ -258,7 +258,7 @@ az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
 
 # In[16]:
 
-pumping_scheme_file="pump140826.scheme"
+pumping_scheme_file="pump160829.scheme"
 prohibited_area_min=2.
 pumping_scheme=get_pumping_scheme_from_file(pumping_scheme_file)
 pumping_scheme_list = [', '.join((ps[0].strftime('%Y-%m-%dT%H:%M:%S'),str(ps[1]) + ' min',str(ps[2])+' min',str(ps[3]),str(ps[4]),str(ps[5])+' kHz')) for ps in pumping_scheme]
