@@ -367,7 +367,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
     ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
     pcm1=plt.pcolormesh(img,vmin=-20,vmax=20)
     ax1.set_ylim(img.shape[0],0)
-    ax1.set_xlim(0,img.shape[1])
+    ax1.set_xlim(img.shape[1],0)
     plt.axis('equal')
     plt.title('LIGHT',loc='left')
     plt.title(f_date_iso,loc='right')
@@ -380,7 +380,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
     pcm2=plt.pcolormesh(dark*keo_spcal_day_coef,vmin=med-100,vmax=med+100)
     
     ax2.set_ylim(img.shape[0],0)
-    ax2.set_xlim(0,img.shape[1])
+    ax2.set_xlim(img.shape[1],0)
     plt.axis('equal')
     coefs_title=' '.join(("{:4.2f}".format(keo_spcal_day_coef),
                           "{:5.3f}".format(keo_spcal_std),
