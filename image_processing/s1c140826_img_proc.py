@@ -353,6 +353,13 @@ for i in range(bf_inds[0],bf_inds[-1]):
     hdu_dark.header['DATE-OBS']=f_date_iso
     hdu_dark.header['BITPIX']=-64
     hdu_dark.header['EXPTIME']=f_exp
+    hdu_dark.header['PROJ-TYP']='TAN'
+    hdu_dark.header['AMCAL-A0']=az0
+    hdu_dark.header['AMCAL-H0']=alt0
+    hdu_dark.header['AMCAL-A']=str(a)
+    hdu_dark.header['AMCAL-B']=str(b)
+    hdu_dark.header['AMCAL-C']=str(c)
+    hdu_dark.header['AMCAL-D']=str(d)
     hdu_dark.header['MED-WID1']=avr_width1
     hdulist_dark = fits.HDUList([hdu_dark])
     hdulist_dark.writeto(spath+fn.split('/')[-1].split('.')[-2]+"_dark.fit",overwrite=True)
@@ -365,6 +372,13 @@ for i in range(bf_inds[0],bf_inds[-1]):
     hdu_light.header['DATE-OBS']=f_date_iso
     hdu_light.header['BITPIX']=-64
     hdu_light.header['EXPTIME']=f_exp
+    hdu_light.header['PROJ-TYP']='TAN'
+    hdu_light.header['AMCAL-A0']=az0
+    hdu_light.header['AMCAL-H0']=alt0
+    hdu_light.header['AMCAL-A']=str(a)
+    hdu_light.header['AMCAL-B']=str(b)
+    hdu_light.header['AMCAL-C']=str(c)
+    hdu_light.header['AMCAL-D']=str(d)
     hdu_light.header['SPCAL-DC']=s1c_spcal_day_coef
     hdu_light.header['SPCAL-DS']=s1c_spcal_std
     hdu_light.header['SPCAL-C']=sp_coef
