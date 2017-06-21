@@ -154,7 +154,7 @@ def shift_img(img_base, base_time, obs_time):
 
 keo_fit_path="../data/160829/keo"
 base_frames_fname="keo_160829_base.frames"
-solve_pars_fname="../astrometric_calibration/keo_160829_solve.pars"
+solve_pars_fname="../astrometric_calibration/keo_160829_solve_manual.pars"
 keo_spcal_day_fname = "../spectrophotometric_calibration/keo_160829_day.spcal"
 keo_spcal_fname = "../spectrophotometric_calibration/keo_160829.spcal"
 masterdark_fname="../spectrophotometric_calibration/keo_160829_masterdark.fit"
@@ -198,6 +198,7 @@ if not os.path.exists(spath):
 hdulist = fits.open(masterdark_fname,ignore_missing_end=True)
 masterdark=hdulist[0].data
 hdulist.close()
+
 
 # In[11]:
 
@@ -258,6 +259,13 @@ az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
 
 # In[16]:
 
+az_c, alt_c = arc_pix2hor(255,255,az0,alt0,a,b)
+print(az_c*180/np.pi,alt_c*180/np.pi)
+# 292.814270937 83.6690150447
+
+
+# In[17]:
+
 pumping_scheme_file="pump160829.scheme"
 prohibited_area_min=2.
 pumping_scheme=get_pumping_scheme_from_file(pumping_scheme_file)
@@ -265,12 +273,12 @@ pumping_scheme_list = [', '.join((ps[0].strftime('%Y-%m-%dT%H:%M:%S'),str(ps[1])
 date_axe_clean, x_dates_clean, clean_pumping = make_clean_pumping_scheme(pumping_scheme)
 
 
-# In[40]:
+# In[20]:
 
 left_bf_ind=0
 right_bf_ind=0
 for i in range(bf_inds[0],bf_inds[-1]):
-# for i in range(36,37):
+# for i in range(69,70):
     sys.stdout.write('\r')
     sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(range(bf_inds[-1]))))
     sys.stdout.flush()
@@ -366,6 +374,12 @@ for i in range(bf_inds[0],bf_inds[-1]):
     dx=0.05
     ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
     pcm1=plt.pcolormesh(img,vmin=-20,vmax=20)
+    
+    plt.plot([175,275],[325,325],'r',lw=2)
+    plt.plot([175,275],[425,425],'r',lw=2)
+    plt.plot([175,175],[325,425],'r',lw=2)
+    plt.plot([275,275],[325,425],'r',lw=2)   
+    
     ax1.set_ylim(img.shape[0],0)
     ax1.set_xlim(img.shape[1],0)
     plt.axis('equal')
@@ -378,6 +392,11 @@ for i in range(bf_inds[0],bf_inds[-1]):
     ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
     med=np.median(dark*keo_spcal_day_coef)
     pcm2=plt.pcolormesh(dark*keo_spcal_day_coef,vmin=med-100,vmax=med+100)
+    
+    plt.plot([175,275],[325,325],'r',lw=2)
+    plt.plot([175,275],[425,425],'r',lw=2)
+    plt.plot([175,175],[325,425],'r',lw=2)
+    plt.plot([275,275],[325,425],'r',lw=2)
     
     ax2.set_ylim(img.shape[0],0)
     ax2.set_xlim(img.shape[1],0)

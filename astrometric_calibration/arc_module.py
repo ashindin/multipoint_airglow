@@ -70,7 +70,7 @@ def arc_pix2hor(x,y,az0,alt0,a,b):
     Y=b[0]+b[1]*x+b[2]*y
     
     #AZ_I=np.arctan2(X,-Y)
-    AZ_I=np.arctan2(X,-Y)
+    AZ_I=np.arctan2(X,Y)
     R=np.sqrt(X**2+Y**2)
     
     ALT_I=(90-R)*np.pi/180 # ARC PROJECTION
