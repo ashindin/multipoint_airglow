@@ -122,15 +122,15 @@ def sbig_exam_solving_pic(fit_path,save_fname, lat_deg=56.1501667,lon_deg=46.105
     
     vrange=1000
     vshift=2000
-    for i in range(num_frames):
+    for i in range(num_frames-1,num_frames):
         sys.stdout.write('\r')
         sys.stdout.write("Processing frame "+str(i+1)+"/"+str(num_frames))
         sys.stdout.flush()
         fname=fit_filenames[i]
         sbig_site=EarthLocation(lat=lat_deg*u.deg, lon=lon_deg*u.deg, height=hei_m*u.m)
         date_obs=sbig_get_date_obs(fname)
-        if i==0:
-            png_prefix=spath+"frame_sbig_"+str(date_obs.year)[2::]+"{0:0>2}".format(date_obs.month)+"{0:0>2}".format(date_obs.day)+"_"
+        #if i==0:
+        png_prefix=spath+"frame_sbig_"+str(date_obs.year)[2::]+"{0:0>2}".format(date_obs.month)+"{0:0>2}".format(date_obs.day)+"_"
         
         SC=SkyCoord(ra_filt, dec_filt, frame='icrs', unit='deg');
 

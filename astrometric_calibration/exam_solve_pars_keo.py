@@ -130,8 +130,8 @@ def keo_exam_solving_pic(fit_path,save_fname, lat_deg=55.9305361,lon_deg=48.7444
         fname=fit_filenames[i]
         keo_site=EarthLocation(lat=lat_deg*u.deg, lon=lon_deg*u.deg, height=hei_m*u.m)
         date_obs=keo_get_date_obs(fname)
-        if i==0:
-            png_prefix=spath+"frame_keo_"+str(date_obs.year)[2::]+"{0:0>2}".format(date_obs.month)+"{0:0>2}".format(date_obs.day)+"_"
+        #if i==0:
+        png_prefix=spath+"frame_keo_"+str(date_obs.year)[2::]+"{0:0>2}".format(date_obs.month)+"{0:0>2}".format(date_obs.day)+"_"
         
         SC=SkyCoord(ra_filt, dec_filt, frame='icrs', unit='deg');
 
