@@ -327,7 +327,8 @@ for i in range(bf_inds[0],bf_inds[-1]):
     for j in range(len(spcal_fnames)):
         if fn_split==spcal_fnames[j]:
             sp_coef=spcal_coefs[j]
-            sp_offset=abs(sbig_spcal_day_coef-sp_coef)/sbig_spcal_std
+            if sp_coef!=0.0:
+                sp_offset=abs(sbig_spcal_day_coef-sp_coef)/sbig_spcal_std
 
     y=[]
     for j in range(len(bfl_locals)):
