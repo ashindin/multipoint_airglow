@@ -70,6 +70,9 @@ def make_couple_fit(couple_fn, fn1, fn21):
     
     fn1d=fits.getdata(fn1)
     fn1h=fits.getheader(fn1)
+    fn1h['LAT-DEG']=55.9305361
+    fn1h['LON-DEG']=48.7444861
+    fn1h['HEI_M']=91.
 
     fn21d=fits.getdata(fn21)
     fn21h=fits.getheader(fn21)
@@ -80,6 +83,10 @@ def make_couple_fit(couple_fn, fn1, fn21):
     fn21_date=fn21_date_start+datetime.timedelta(seconds=fn21_exptime/2)
     fn21_xdate=dates.date2num(fn21_date)
     fn21_date_end=fn21_date_start+datetime.timedelta(seconds=fn21_exptime)
+    
+    fn21h['LAT-DEG']=56.1501667
+    fn21h['LON-DEG']=46.1050833
+    fn21h['HEI_M']=183.
     
     fits.append(couple_fn,fn1d,fn1h)
     fits.append(couple_fn,fn21d,fn21h)  

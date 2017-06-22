@@ -85,7 +85,10 @@ def make_couple_fit(couple_fn, fn1, fn21, fn22):
     
     fn1d=fits.getdata(fn1)
     fn1h=fits.getheader(fn1)
-
+    fn1h['LAT-DEG']=55.9305361
+    fn1h['LON-DEG']=48.7444861
+    fn1h['HEI_M']=91.
+    
     fn21d=fits.getdata(fn21)
     fn21h=fits.getheader(fn21)
     fn21_exptime=fn21h['EXPTIME']
@@ -118,7 +121,9 @@ def make_couple_fit(couple_fn, fn1, fn21, fn22):
     fn21h['EXPTIME']=fn2_exptime
     fn21h['SPCAL-C']=fn2_spcalc
     fn21h['SPCAL-C']=fn2_spcalo
-    
+    fn21h['LAT-DEG']=56.1501667
+    fn21h['LON-DEG']=46.1050833
+    fn21h['HEI_M']=183.
     fits.append(couple_fn,fn1d,fn1h)
     fits.append(couple_fn,fn2d,fn21h)    
     

@@ -158,11 +158,11 @@ solve_pars_fname="../astrometric_calibration/keo_140824_solve_manual.pars"
 keo_spcal_day_fname = "../spectrophotometric_calibration/keo_140824_day.spcal"
 keo_spcal_fname = "../spectrophotometric_calibration/keo_140824.spcal"
 masterdark_fname="../spectrophotometric_calibration/keo_140824_masterdark.fit"
-lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
-lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
-hei_cam=183.;
+lat_cam_deg=55.9305361; lat_cam=lat_cam_deg*np.pi/180;
+lon_cam_deg=48.7444861; lon_cam=lon_cam_deg*np.pi/180;
+hei_cam=91.;
 CAM_site=EarthLocation(lat=lat_cam_deg*u.deg, lon=lon_cam_deg*u.deg, height=hei_cam*u.m)
-avr_width1=3
+avr_width1=7
 avr_width2=15
 interp_deg=2 # three points
 
