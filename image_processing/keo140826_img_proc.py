@@ -13,7 +13,7 @@ cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(insp
 if cmd_subfolder not in sys.path:
     sys.path.insert(0, cmd_subfolder)
 
-from tan_module import *
+from arc_module import *
 from matplotlib import dates
 
 
@@ -41,27 +41,16 @@ from matplotlib import dates
 
 # In[5]:
 
-def s1c_get_date_obs(filename,ut_shift=-3):
-    fdt=open(filename,'r',errors = 'ignore')
-    fdt.seek(8*80)
-    test=fdt.read(39)
-    fdt.close()
-    test=test[15::]
-    ms=test[16:20]
-    if ms=='1000':
-        test=test[0:16]+'000 2014'
-#         test[16]='0'
-        obs_time=datetime.datetime.strptime(test,'%b %d %H:%M:%S.%f %Y')+datetime.timedelta(hours=ut_shift)+datetime.timedelta(seconds=1)
-    else:
-        obs_time=datetime.datetime.strptime(test,'%b %d %H:%M:%S.%f %Y')+datetime.timedelta(hours=ut_shift)
-    return obs_time
+def keo_get_date_obs(filename):
+    fid_fit=fits.open(filename);
+    date_obs_str=fid_fit[0].header["DATE-OBS"]  
+    fid_fit.close()
+    return datetime.datetime.strptime(date_obs_str,"%Y-%m-%dT%H:%M:%S")
 
-def s1c_get_exp_sec(filename):
-    fdt=open(filename,'r',errors = 'ignore')
-    fdt.seek(7*80)
-    temp=fdt.read(80)
-    exp_sec=float(temp.split("=")[-1].split(" ")[1])
-    fdt.close()
+def keo_get_exp_sec(filename):
+    fid_fit=fits.open(filename);
+    exp_sec=fid_fit[0].header["EXPTIME"]  
+    fid_fit.close()
     return exp_sec
 
 def get_solve_pars(save_fname):
@@ -136,10 +125,10 @@ def shift_img(img_base, base_time, obs_time):
     XPIX2=np.copy(XPIX)
     YPIX2=np.copy(YPIX)
 
-    AZ,ALT=tan_pix2hor(XPIX,YPIX,az0,alt0,a,b)
+    AZ,ALT=arc_pix2hor(XPIX,YPIX,az0,alt0,a,b)
     C=SkyCoord(alt = ALT*u.rad, az = AZ*u.rad, obstime = base_time, frame = 'altaz', location = CAM_site, temperature=15*u.deg_C,pressure=1013*u.hPa, relative_humidity=0.63,obswl=630.0*u.nm)
     ALTAZ_new=C.transform_to(AltAz(obstime = obs_time, location = CAM_site, temperature=15*u.deg_C,pressure=1013*u.hPa, relative_humidity=0.63,obswl=630.0*u.nm))
-    XPIX2, YPIX2=tan_hor2pix(ALTAZ_new.az.rad,ALTAZ_new.alt.rad,az0,alt0,c,d)
+    XPIX2, YPIX2=arc_hor2pix(ALTAZ_new.az.rad,ALTAZ_new.alt.rad,az0,alt0,c,d)
 
     med_value=np.median(img_base)
     img_mod=np.zeros_like(img_base)
@@ -163,31 +152,30 @@ def shift_img(img_base, base_time, obs_time):
 
 # In[6]:
 
-s1c_fit_path="../data/140824/s1c"
-base_frames_fname="s1c_140824_base.frames"
-solve_pars_fname="../astrometric_calibration/s1c_140824_solve.pars"
-s1c_spcal_day_fname = "../spectrophotometric_calibration/s1c_140824_day.spcal"
-s1c_spcal_fname = "../spectrophotometric_calibration/s1c_140824.spcal"
-masterdark_fname="../spectrophotometric_calibration/s1c_140824_masterdark.fit"
-masterflat_fname="../spectrophotometric_calibration/s1c_master.flat"
+keo_fit_path="../data/140826/keo"
+base_frames_fname="keo_140826_base.frames"
+solve_pars_fname="../astrometric_calibration/keo_140826_solve_manual.pars"
+keo_spcal_day_fname = "../spectrophotometric_calibration/keo_140826_day.spcal"
+keo_spcal_fname = "../spectrophotometric_calibration/keo_140826.spcal"
+masterdark_fname="../spectrophotometric_calibration/keo_140826_masterdark.fit"
 lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
 lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
 hei_cam=183.;
 CAM_site=EarthLocation(lat=lat_cam_deg*u.deg, lon=lon_cam_deg*u.deg, height=hei_cam*u.m)
-avr_width1=11
-avr_width2=59
+avr_width1=3
+avr_width2=15
 interp_deg=2 # three points
 
 
 # In[7]:
 
-s1c_spcal_day_coef, s1c_spcal_std=get_spcal_day_coefs(s1c_spcal_day_fname)
-s1c_spcal_day_coef, s1c_spcal_std
+keo_spcal_day_coef, keo_spcal_std=get_spcal_day_coefs(keo_spcal_day_fname)
+keo_spcal_day_coef, keo_spcal_std
 
 
 # In[8]:
 
-fid=open(s1c_spcal_fname,'r')
+fid=open(keo_spcal_fname,'r')
 lines=fid.readlines()
 spcal_fnames=[]
 spcal_coefs=[]
@@ -200,7 +188,7 @@ fid.close()
 
 # In[9]:
 
-spath="./s1c140824_glowfit/"
+spath="./keo140826_glowfit/"
 if not os.path.exists(spath):
     os.makedirs(spath)
 
@@ -209,9 +197,6 @@ if not os.path.exists(spath):
 
 hdulist = fits.open(masterdark_fname,ignore_missing_end=True)
 masterdark=hdulist[0].data
-hdulist.close()
-hdulist = fits.open(masterflat_fname,ignore_missing_end=True)
-masterflat=hdulist[0].data
 hdulist.close()
 
 
@@ -224,21 +209,21 @@ base_frames=[]
 for i in range(len(lines)):
     if lines[i]!='\n':
         base_frames.append(lines[i][0:-1])
-s1c_fit_filenames=sorted([s1c_fit_path+'/'+fn for fn in next(os.walk(s1c_fit_path))[2]])
-base_frames_fullnames=[s1c_fit_path + "/" + bf_name for bf_name in base_frames]
+keo_fit_filenames=sorted([keo_fit_path+'/'+fn for fn in next(os.walk(keo_fit_path))[2]])
+base_frames_fullnames=[keo_fit_path + "/" + bf_name for bf_name in base_frames]
 
 
 # In[12]:
 
-fr_inds=list(range(len(s1c_fit_filenames)))
+fr_inds=list(range(len(keo_fit_filenames)))
 bf_inds=[]
 bf_dates=[]
 bf_x_dates=[]
 for bfn in base_frames_fullnames:
     for i in fr_inds:
-        if bfn==s1c_fit_filenames[i]:
+        if bfn==keo_fit_filenames[i]:
             bf_inds.append(i)
-    bf_dates.append(s1c_get_date_obs(bfn,-4)+datetime.timedelta(seconds=s1c_get_exp_sec(bfn)/2))
+    bf_dates.append(keo_get_date_obs(bfn)+datetime.timedelta(seconds=keo_get_exp_sec(bfn)/2))
     bf_x_dates.append(dates.date2num(bf_dates[-1]))
 bf_inds_local=list(range(len(bf_inds)))
 # bf_dates
@@ -257,9 +242,7 @@ for i in range(len(base_frames_fullnames)):
 #     BF_imgs[:,:,i]=hdulist[0].data.astype('float')
     BF_imgs.append(hdulist[0].data.astype('float'))
     hdulist.close()
-#     BF_imgs[:,:,i]=(BF_imgs[:,:,i]-masterdark.astype('float'))/masterflat.astype('float')
-#     BF_imgs[:,:,i]=ss.medfilt(BF_imgs[:,:,i],kernel_size=avr_width1)
-    BF_imgs[-1]=(BF_imgs[-1]-masterdark.astype('float'))/masterflat.astype('float')
+    BF_imgs[-1]=(BF_imgs[-1]-masterdark.astype('float'))
     BF_imgs[-1]=ss.medfilt(BF_imgs[-1],kernel_size=avr_width1)
 
 
@@ -276,19 +259,26 @@ az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
 
 # In[16]:
 
-pumping_scheme_file="pump140824.scheme"
+#az_c, alt_c = arc_pix2hor(255,255,az0,alt0,a,b)
+#print(az_c*180/np.pi,alt_c*180/np.pi)
+# 292.814270937 83.6690150447
+
+
+# In[17]:
+
+pumping_scheme_file="pump140826.scheme"
 prohibited_area_min=2.
 pumping_scheme=get_pumping_scheme_from_file(pumping_scheme_file)
 pumping_scheme_list = [', '.join((ps[0].strftime('%Y-%m-%dT%H:%M:%S'),str(ps[1]) + ' min',str(ps[2])+' min',str(ps[3]),str(ps[4]),str(ps[5])+' kHz')) for ps in pumping_scheme]
 date_axe_clean, x_dates_clean, clean_pumping = make_clean_pumping_scheme(pumping_scheme)
 
 
-# In[40]:
+# In[20]:
 
 left_bf_ind=0
 right_bf_ind=0
 for i in range(bf_inds[0],bf_inds[-1]):
-# for i in range(36,37):
+# for i in range(69,70):
     sys.stdout.write('\r')
     sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(range(bf_inds[-1]))))
     sys.stdout.flush()
@@ -296,9 +286,9 @@ for i in range(bf_inds[0],bf_inds[-1]):
     bfd_locals=[]
     bfl_locals=[]
     bfdx_locals=[]
-    fn=s1c_fit_filenames[i]
-    f_exp=s1c_get_exp_sec(fn)
-    f_date_start=s1c_get_date_obs(fn,-4)
+    fn=keo_fit_filenames[i]
+    f_exp=keo_get_exp_sec(fn)
+    f_date_start=keo_get_date_obs(fn)
     f_date=f_date_start+datetime.timedelta(seconds=f_exp/2)
     f_date_end=f_date_start+datetime.timedelta(seconds=f_exp)
     f_x_date_start=dates.date2num(f_date_start)
@@ -338,7 +328,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
     for j in range(len(spcal_fnames)):
         if fn_split==spcal_fnames[j]:
             sp_coef=spcal_coefs[j]
-            sp_offset=abs(s1c_spcal_day_coef-sp_coef)/s1c_spcal_std
+            sp_offset=abs(keo_spcal_day_coef-sp_coef)/keo_spcal_std
 
     y=[]
     for j in range(len(bfl_locals)):
@@ -350,11 +340,11 @@ for i in range(bf_inds[0],bf_inds[-1]):
 
     f_date_iso=f_date_start.strftime('%Y-%m-%dT%H:%M:%S')
 
-    hdu_dark = fits.PrimaryHDU(dark*s1c_spcal_day_coef)
+    hdu_dark = fits.PrimaryHDU(dark*keo_spcal_day_coef)
     hdu_dark.header['DATE-OBS']=f_date_iso
     hdu_dark.header['BITPIX']=-64
     hdu_dark.header['EXPTIME']=f_exp
-    hdu_dark.header['PROJ-TYP']='TAN'
+    hdu_dark.header['PROJ-TYP']='ARC'
     hdu_dark.header['AMCAL-A0']=az0
     hdu_dark.header['AMCAL-H0']=alt0
     hdu_dark.header['AMCAL-A']=str(a)
@@ -367,21 +357,21 @@ for i in range(bf_inds[0],bf_inds[-1]):
 
     hdulist = fits.open(fn,ignore_missing_end=True)
     img=hdulist[0].data.astype('float')
-    img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * s1c_spcal_day_coef
+    img=ss.medfilt((img-masterdark.astype('float')) - dark,kernel_size=avr_width2) * keo_spcal_day_coef
 
     hdu_light = fits.PrimaryHDU(img)
     hdu_light.header['DATE-OBS']=f_date_iso
     hdu_light.header['BITPIX']=-64
     hdu_light.header['EXPTIME']=f_exp
-    hdu_light.header['PROJ-TYP']='TAN'
+    hdu_light.header['PROJ-TYP']='ARC'
     hdu_light.header['AMCAL-A0']=az0
     hdu_light.header['AMCAL-H0']=alt0
     hdu_light.header['AMCAL-A']=str(a)
     hdu_light.header['AMCAL-B']=str(b)
     hdu_light.header['AMCAL-C']=str(c)
     hdu_light.header['AMCAL-D']=str(d)
-    hdu_light.header['SPCAL-DC']=s1c_spcal_day_coef
-    hdu_light.header['SPCAL-DS']=s1c_spcal_std
+    hdu_light.header['SPCAL-DC']=keo_spcal_day_coef
+    hdu_light.header['SPCAL-DS']=keo_spcal_std
     hdu_light.header['SPCAL-C']=sp_coef
     hdu_light.header['SPCAL-O']=sp_offset
     hdu_light.header['MED-WID1']=avr_width1
@@ -398,8 +388,15 @@ for i in range(bf_inds[0],bf_inds[-1]):
     dx=0.05
     ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
     pcm1=plt.pcolormesh(img,vmin=-20,vmax=20)
-
-    ax1.set_ylim(288,0)
+    
+    plt.plot([175,275],[325,325],'r',lw=2)
+    plt.plot([175,275],[425,425],'r',lw=2)
+    plt.plot([175,175],[325,425],'r',lw=2)
+    plt.plot([275,275],[325,425],'r',lw=2)   
+    
+    ax1.set_ylim(img.shape[0],0)
+    ax1.set_xlim(img.shape[1],0)
+    plt.axis('equal')
     plt.title('LIGHT',loc='left')
     plt.title(f_date_iso,loc='right')
 
@@ -407,12 +404,19 @@ for i in range(bf_inds[0],bf_inds[-1]):
     plt.colorbar(pcm1,ax1_cb)
 
     ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
-    med=np.median(dark*s1c_spcal_day_coef)
-    pcm2=plt.pcolormesh(dark*s1c_spcal_day_coef,vmin=med-100,vmax=med+100)
-    # plt.colorbar()
-    ax2.set_ylim(288,0)
-    coefs_title=' '.join(("{:4.2f}".format(s1c_spcal_day_coef),
-                          "{:5.3f}".format(s1c_spcal_std),
+    med=np.median(dark*keo_spcal_day_coef)
+    pcm2=plt.pcolormesh(dark*keo_spcal_day_coef,vmin=med-100,vmax=med+100)
+    
+    plt.plot([175,275],[325,325],'r',lw=2)
+    plt.plot([175,275],[425,425],'r',lw=2)
+    plt.plot([175,175],[325,425],'r',lw=2)
+    plt.plot([275,275],[325,425],'r',lw=2)
+    
+    ax2.set_ylim(img.shape[0],0)
+    ax2.set_xlim(img.shape[1],0)
+    plt.axis('equal')
+    coefs_title=' '.join(("{:4.2f}".format(keo_spcal_day_coef),
+                          "{:5.3f}".format(keo_spcal_std),
                           "{:4.2f}".format(sp_coef),
                           "{:4.2f}".format(sp_offset)))
     plt.title("SUBSTRACT",loc='left')

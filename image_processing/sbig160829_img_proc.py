@@ -41,27 +41,16 @@ from matplotlib import dates
 
 # In[5]:
 
-def s1c_get_date_obs(filename,ut_shift=-3):
-    fdt=open(filename,'r',errors = 'ignore')
-    fdt.seek(8*80)
-    test=fdt.read(39)
-    fdt.close()
-    test=test[15::]
-    ms=test[16:20]
-    if ms=='1000':
-        test=test[0:16]+'000 2014'
-#         test[16]='0'
-        obs_time=datetime.datetime.strptime(test,'%b %d %H:%M:%S.%f %Y')+datetime.timedelta(hours=ut_shift)+datetime.timedelta(seconds=1)
-    else:
-        obs_time=datetime.datetime.strptime(test,'%b %d %H:%M:%S.%f %Y')+datetime.timedelta(hours=ut_shift)
-    return obs_time
+def sbig_get_date_obs(filename):
+    fid_fit=fits.open(filename);
+    date_obs_str=fid_fit[0].header["DATE-OBS"]  
+    fid_fit.close()
+    return datetime.datetime.strptime(date_obs_str,"%Y-%m-%dT%H:%M:%S.%f")
 
-def s1c_get_exp_sec(filename):
-    fdt=open(filename,'r',errors = 'ignore')
-    fdt.seek(7*80)
-    temp=fdt.read(80)
-    exp_sec=float(temp.split("=")[-1].split(" ")[1])
-    fdt.close()
+def sbig_get_exp_sec(filename):
+    fid_fit=fits.open(filename);
+    exp_sec=fid_fit[0].header["EXPTIME"]  
+    fid_fit.close()
     return exp_sec
 
 def get_solve_pars(save_fname):
@@ -163,13 +152,13 @@ def shift_img(img_base, base_time, obs_time):
 
 # In[6]:
 
-s1c_fit_path="../data/140824/s1c"
-base_frames_fname="s1c_140824_base.frames"
-solve_pars_fname="../astrometric_calibration/s1c_140824_solve.pars"
-s1c_spcal_day_fname = "../spectrophotometric_calibration/s1c_140824_day.spcal"
-s1c_spcal_fname = "../spectrophotometric_calibration/s1c_140824.spcal"
-masterdark_fname="../spectrophotometric_calibration/s1c_140824_masterdark.fit"
-masterflat_fname="../spectrophotometric_calibration/s1c_master.flat"
+sbig_fit_path="../data/160829/sbig"
+base_frames_fname="sbig_160829_base.frames"
+solve_pars_fname="../astrometric_calibration/sbig_160829_solve.pars"
+sbig_spcal_day_fname = "../spectrophotometric_calibration/sbig_160829_day.spcal"
+sbig_spcal_fname = "../spectrophotometric_calibration/sbig_160829.spcal"
+masterdark_fname="../spectrophotometric_calibration/sbig_160829_masterdark.fit"
+masterflat_fname="../spectrophotometric_calibration/sbig_master.flat"
 lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
 lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
 hei_cam=183.;
@@ -181,13 +170,13 @@ interp_deg=2 # three points
 
 # In[7]:
 
-s1c_spcal_day_coef, s1c_spcal_std=get_spcal_day_coefs(s1c_spcal_day_fname)
-s1c_spcal_day_coef, s1c_spcal_std
+sbig_spcal_day_coef, sbig_spcal_std=get_spcal_day_coefs(sbig_spcal_day_fname)
+sbig_spcal_day_coef, sbig_spcal_std
 
 
 # In[8]:
 
-fid=open(s1c_spcal_fname,'r')
+fid=open(sbig_spcal_fname,'r')
 lines=fid.readlines()
 spcal_fnames=[]
 spcal_coefs=[]
@@ -200,7 +189,7 @@ fid.close()
 
 # In[9]:
 
-spath="./s1c140824_glowfit/"
+spath="./sbig160829_glowfit/"
 if not os.path.exists(spath):
     os.makedirs(spath)
 
@@ -224,21 +213,21 @@ base_frames=[]
 for i in range(len(lines)):
     if lines[i]!='\n':
         base_frames.append(lines[i][0:-1])
-s1c_fit_filenames=sorted([s1c_fit_path+'/'+fn for fn in next(os.walk(s1c_fit_path))[2]])
-base_frames_fullnames=[s1c_fit_path + "/" + bf_name for bf_name in base_frames]
+sbig_fit_filenames=sorted([sbig_fit_path+'/'+fn for fn in next(os.walk(sbig_fit_path))[2]])
+base_frames_fullnames=[sbig_fit_path + "/" + bf_name for bf_name in base_frames]
 
 
 # In[12]:
 
-fr_inds=list(range(len(s1c_fit_filenames)))
+fr_inds=list(range(len(sbig_fit_filenames)))
 bf_inds=[]
 bf_dates=[]
 bf_x_dates=[]
 for bfn in base_frames_fullnames:
     for i in fr_inds:
-        if bfn==s1c_fit_filenames[i]:
+        if bfn==sbig_fit_filenames[i]:
             bf_inds.append(i)
-    bf_dates.append(s1c_get_date_obs(bfn,-4)+datetime.timedelta(seconds=s1c_get_exp_sec(bfn)/2))
+    bf_dates.append(sbig_get_date_obs(bfn)+datetime.timedelta(seconds=sbig_get_exp_sec(bfn)/2))
     bf_x_dates.append(dates.date2num(bf_dates[-1]))
 bf_inds_local=list(range(len(bf_inds)))
 # bf_dates
@@ -276,7 +265,7 @@ az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
 
 # In[16]:
 
-pumping_scheme_file="pump140824.scheme"
+pumping_scheme_file="pump160829.scheme"
 prohibited_area_min=2.
 pumping_scheme=get_pumping_scheme_from_file(pumping_scheme_file)
 pumping_scheme_list = [', '.join((ps[0].strftime('%Y-%m-%dT%H:%M:%S'),str(ps[1]) + ' min',str(ps[2])+' min',str(ps[3]),str(ps[4]),str(ps[5])+' kHz')) for ps in pumping_scheme]
@@ -296,9 +285,9 @@ for i in range(bf_inds[0],bf_inds[-1]):
     bfd_locals=[]
     bfl_locals=[]
     bfdx_locals=[]
-    fn=s1c_fit_filenames[i]
-    f_exp=s1c_get_exp_sec(fn)
-    f_date_start=s1c_get_date_obs(fn,-4)
+    fn=sbig_fit_filenames[i]
+    f_exp=sbig_get_exp_sec(fn)
+    f_date_start=sbig_get_date_obs(fn)
     f_date=f_date_start+datetime.timedelta(seconds=f_exp/2)
     f_date_end=f_date_start+datetime.timedelta(seconds=f_exp)
     f_x_date_start=dates.date2num(f_date_start)
@@ -338,7 +327,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
     for j in range(len(spcal_fnames)):
         if fn_split==spcal_fnames[j]:
             sp_coef=spcal_coefs[j]
-            sp_offset=abs(s1c_spcal_day_coef-sp_coef)/s1c_spcal_std
+            sp_offset=abs(sbig_spcal_day_coef-sp_coef)/sbig_spcal_std
 
     y=[]
     for j in range(len(bfl_locals)):
@@ -350,7 +339,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
 
     f_date_iso=f_date_start.strftime('%Y-%m-%dT%H:%M:%S')
 
-    hdu_dark = fits.PrimaryHDU(dark*s1c_spcal_day_coef)
+    hdu_dark = fits.PrimaryHDU(dark*sbig_spcal_day_coef)
     hdu_dark.header['DATE-OBS']=f_date_iso
     hdu_dark.header['BITPIX']=-64
     hdu_dark.header['EXPTIME']=f_exp
@@ -367,7 +356,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
 
     hdulist = fits.open(fn,ignore_missing_end=True)
     img=hdulist[0].data.astype('float')
-    img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * s1c_spcal_day_coef
+    img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * sbig_spcal_day_coef
 
     hdu_light = fits.PrimaryHDU(img)
     hdu_light.header['DATE-OBS']=f_date_iso
@@ -380,8 +369,8 @@ for i in range(bf_inds[0],bf_inds[-1]):
     hdu_light.header['AMCAL-B']=str(b)
     hdu_light.header['AMCAL-C']=str(c)
     hdu_light.header['AMCAL-D']=str(d)
-    hdu_light.header['SPCAL-DC']=s1c_spcal_day_coef
-    hdu_light.header['SPCAL-DS']=s1c_spcal_std
+    hdu_light.header['SPCAL-DC']=sbig_spcal_day_coef
+    hdu_light.header['SPCAL-DS']=sbig_spcal_std
     hdu_light.header['SPCAL-C']=sp_coef
     hdu_light.header['SPCAL-O']=sp_offset
     hdu_light.header['MED-WID1']=avr_width1
@@ -398,8 +387,9 @@ for i in range(bf_inds[0],bf_inds[-1]):
     dx=0.05
     ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
     pcm1=plt.pcolormesh(img,vmin=-20,vmax=20)
-
-    ax1.set_ylim(288,0)
+    ax1.set_ylim(img.shape[0],0)
+    ax1.set_xlim(0,img.shape[1])
+    plt.axis('equal')
     plt.title('LIGHT',loc='left')
     plt.title(f_date_iso,loc='right')
 
@@ -407,12 +397,14 @@ for i in range(bf_inds[0],bf_inds[-1]):
     plt.colorbar(pcm1,ax1_cb)
 
     ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
-    med=np.median(dark*s1c_spcal_day_coef)
-    pcm2=plt.pcolormesh(dark*s1c_spcal_day_coef,vmin=med-100,vmax=med+100)
-    # plt.colorbar()
-    ax2.set_ylim(288,0)
-    coefs_title=' '.join(("{:4.2f}".format(s1c_spcal_day_coef),
-                          "{:5.3f}".format(s1c_spcal_std),
+    med=np.median(dark*sbig_spcal_day_coef)
+    pcm2=plt.pcolormesh(dark*sbig_spcal_day_coef,vmin=med-100,vmax=med+100)
+    
+    ax2.set_ylim(img.shape[0],0)
+    ax2.set_xlim(0,img.shape[1])
+    plt.axis('equal')
+    coefs_title=' '.join(("{:4.2f}".format(sbig_spcal_day_coef),
+                          "{:5.3f}".format(sbig_spcal_std),
                           "{:4.2f}".format(sp_coef),
                           "{:4.2f}".format(sp_offset)))
     plt.title("SUBSTRACT",loc='left')
