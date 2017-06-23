@@ -349,7 +349,7 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
         plt.plot(X_filt,Y_filt,marker="o", lw=0.,mew=mew,mec="g", mfc='none',ms=ms)
         plt.plot(X_filt2,Y_filt2,marker="o", lw=0.,mew=mew,mec="r", mfc='none',ms=ms)
         for j in range(len(X_filt2)):
-            plt.text(X_filt2[j],Y_filt2[j],str(BS_ID_filt2[j])+"_"+str(int(R[j]*100)/100),color='w')
+            plt.text(X_filt2[j],Y_filt2[j],str(BS_ID_filt2[j])+"_"+ "{0:4.2f}".format(R[j]) ,color='w')
         ax.set_xlim((1,372))
         ax.set_ylim((281,1))
         plt.title(fit_fname.split('/')[-1] + " " + "{0:0>2}".format(date_obs.hour) + ":" + "{0:0>2}".format(date_obs.minute) + ":" + "{0:0>2}".format(date_obs.second))
