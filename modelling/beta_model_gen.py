@@ -2,7 +2,7 @@ from sympy import *
 
 # init_printing()
 
-fun_str='a1*exp(-(x/a2)**2 - (y/a3)**2)*1/a4/beta(a5,a6)*((z-h_m)/a4)**(a5-1)*((a4-z+h_m)/a4)**(a6-1)'
+fun_str='a1*exp(-(x/a2)**2 - (y/a3)**2)*1000/a4/beta(a5,a6)*((z)/a4)**(a5-1)*((a4-(z))/a4)**(a6-1)'
 model_fun_fname='model_beta_fun.py'
 
 fun=sympify(fun_str)
@@ -50,9 +50,12 @@ fid.write('import scipy.special as sp\n')
 fid.write('def sphere_fun(R,E,A,aa,mod_pos,cam_pos):\n')
 fid.write('    a1=aa[0]\n    a2=aa[1]\n    a3=aa[2]\n    a4=aa[3]\n    a5=aa[4]\n    a6=aa[5]\n')
 fid.write('    beta_a5a6=sp.beta(a5,a6)\n')
+fid.write('    norm_coef=((a5 - 1)/(a5 + a6 - 2))**a5*((a6 - 1)/(a5 + a6 - 2))**a6*(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4)/(a4*(a5*a6 - a5 - a6 + 1)*sp.beta(a5, a6))\n')
 fid.write('    phi_m=mod_pos[0]\n    lam_m=mod_pos[1]\n    h_m=mod_pos[2]\n')
 fid.write('    phi_k=cam_pos[0]\n    lam_k=cam_pos[1]\n    h_k=cam_pos[2]\n')
 fid.write('    a=6378137.0\n    b=6356752.314245\n    e=0.081819190842965558\n')
 #fid.write('    return 5.627/10**7*(' + funREA_numpy + ')\n')
-fid.write('    return ne.evaluate("5.627/10**7*(' + funREA_str + ')")\n')
+fid.write('    NE=ne.evaluate("norm_coef*5.627/10**7*(' + funREA_str + ')")\n')
+fid.write('    return NE.clip(min=0)\n')
+#fid.write('    return ne.evaluate("norm_coef*5.627/10**7*(' + funREA_str + ')")\n')
 fid.close()
