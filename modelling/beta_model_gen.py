@@ -7,6 +7,11 @@ model_fun_fname='model_beta_fun.py'
 
 fun=sympify(fun_str)
 
+heavy_fun_str1='-z'
+heavy_fun_str2='-z+a4'
+heavy_fun1=sympify(heavy_fun_str1)
+heavy_fun2=sympify(heavy_fun_str2)
+
 x,y,z = symbols('x y z');
 xi,eta,zeta = symbols('xi eta zeta')
 X, Y, Z = symbols('X Y Z')
@@ -35,6 +40,15 @@ funREA=fun.subs([(x,x_fun),
                 (y,y_fun),
                 (z,z_fun)])
 
+heavyREA1=heavy_fun1.subs(z,z_fun)
+heavyREA2=heavy_fun2.subs(z,z_fun)
+
+heavyREA1_str=str(heavyREA1)
+heavyREA2_str=str(heavyREA2)
+
+#heavyREA_str=str(heavyREA).replace('sign','np.signbit')
+#print(heavyREA_str)
+
 #fid=open(model_fname,'w')
 #fid.write('# sphere model function to integrate\n')
 #fid.write(str(funREA)+'\n')
@@ -44,7 +58,7 @@ funREA_str=str(funREA).replace('beta(a5, a6)','beta_a5a6')
 #funREA_numpy=funREA_str.replace('exp','np.exp').replace('sin','np.sin').replace('cos','np.cos').replace('sqrt','np.sqrt')
 
 fid=open(model_fun_fname,'w')
-#fid.write('import numpy as np\n')
+fid.write('import numpy as np\n')
 fid.write('import numexpr as ne\n')
 fid.write('import scipy.special as sp\n')
 fid.write('def sphere_fun(R,E,A,aa,mod_pos,cam_pos):\n')
@@ -55,8 +69,15 @@ fid.write('    norm_coef=1/norm_coef\n')
 fid.write('    phi_m=mod_pos[0]\n    lam_m=mod_pos[1]\n    h_m=mod_pos[2]\n')
 fid.write('    phi_k=cam_pos[0]\n    lam_k=cam_pos[1]\n    h_k=cam_pos[2]\n')
 fid.write('    a=6378137.0\n    b=6356752.314245\n    e=0.081819190842965558\n')
-#fid.write('    return 5.627/10**7*(' + funREA_numpy + ')\n')
+
 fid.write('    NE=ne.evaluate("norm_coef*5.627/10**7*(' + funREA_str + ')")\n')
-fid.write('    return NE.clip(min=0)\n')
-#fid.write('    return ne.evaluate("norm_coef*5.627/10**7*(' + funREA_str + ')")\n')
+
+fid.write('    H1=ne.evaluate("'+ heavyREA1_str +'")\n')
+fid.write('    H2=ne.evaluate("'+ heavyREA2_str +'")\n')
+fid.write('    H1=np.signbit(H1)\n')
+fid.write('    H2=np.signbit(H2)\n')
+
+#fid.write('    return NE*H1*H2\n')
+fid.write('    return H1*(~H2)*NE\n')
+
 fid.close()
