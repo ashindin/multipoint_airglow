@@ -348,7 +348,7 @@ for i in range(bf_inds[0],bf_inds[-1]):
     dark=(bfdx_locals[0]**2*bfdx_locals[1]*y[2]+bfdx_locals[2]**2*bfdx_locals[0]*y[1]+bfdx_locals[1]**2*bfdx_locals[2]*y[0]
         -bfdx_locals[2]**2*bfdx_locals[1]*y[0]-bfdx_locals[1]**2*bfdx_locals[0]*y[2]-bfdx_locals[0]**2*bfdx_locals[2]*y[1])/det
 
-    f_date_iso=f_date_start.strftime('%Y-%m-%dT%H:%M:%S')
+    f_date_iso=f_date_start.strftime('%Y-%m-%dT%H:%M:%S.%f')
 
     hdu_dark = fits.PrimaryHDU(dark*s1c_spcal_day_coef)
     hdu_dark.header['DATE-OBS']=f_date_iso

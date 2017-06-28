@@ -73,13 +73,15 @@ def make_couple_fit(couple_fn, fn1, fn21):
     fn1h['LAT-DEG']=55.9305361
     fn1h['LON-DEG']=48.7444861
     fn1h['HEI_M']=91.
+    fn1_date=datetime.datetime.strptime(fn1h['DATE-OBS'],'%Y-%m-%dT%H:%M:%S.%f')
+    fn1h['DATE-OBS']=fn1_date.strftime('%Y-%m-%dT%H:%M:%S.%f')
 
     fn21d=fits.getdata(fn21)
     fn21h=fits.getheader(fn21)
     fn21_exptime=fn21h['EXPTIME']
     fn21_spcalc=fn21h['SPCAL-C']
     fn21_spcalo=fn21h['SPCAL-O']
-    fn21_date_start=datetime.datetime.strptime(fn21h['DATE-OBS'],'%Y-%m-%dT%H:%M:%S')
+    fn21_date_start=datetime.datetime.strptime(fn21h['DATE-OBS'],'%Y-%m-%dT%H:%M:%S.%f')
     fn21_date=fn21_date_start+datetime.timedelta(seconds=fn21_exptime/2)
     fn21_xdate=dates.date2num(fn21_date)
     fn21_date_end=fn21_date_start+datetime.timedelta(seconds=fn21_exptime)
