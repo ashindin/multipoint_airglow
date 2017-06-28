@@ -61,7 +61,7 @@ fid=open(model_fun_fname,'w')
 fid.write('import numpy as np\n')
 fid.write('import numexpr as ne\n')
 fid.write('import scipy.special as sp\n')
-fid.write('def sphere_fun(R,E,A,aa,mod_pos,cam_pos):\n')
+fid.write('def drop_fun(R,E,A,aa,mod_pos,cam_pos):\n')
 fid.write('    a1=aa[0]\n    a2=aa[1]\n    a3=aa[2]\n    a4=aa[3]\n')
 
 fid.write('    if aa[4]<0:\n')
