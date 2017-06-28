@@ -3,7 +3,7 @@ from sympy import *
 # init_printing()
 
 fun_str='a1*exp(-(x/a2)**2 - (y/a3)**2)/a4/beta(a5,a6)*((z)/a4)**(a5-1)*((a4-(z))/a4)**(a6-1)'
-model_fun_fname='model_beta_fun.py'
+model_fun_fname='model_drop_fun.py'
 
 fun=sympify(fun_str)
 
