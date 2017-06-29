@@ -33,3 +33,8 @@ image_processing/couples160829
 modelling/*.dat
 modelling/model_*.py
 modelling/__pycache__/
+solving/sphere
+solving/spheroid
+solving/spheroid_incl
+solving/ellipsoid
+solving/drop

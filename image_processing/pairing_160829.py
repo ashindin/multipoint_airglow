@@ -26,7 +26,7 @@ from matplotlib import dates
 def get_fit_pars(fname):
 #     print(fname)
     fid_fit=fits.open(fname);
-    date_obs=datetime.datetime.strptime(fid_fit[0].header["DATE-OBS"],"%Y-%m-%dT%H:%M:%S")
+    date_obs=datetime.datetime.strptime(fid_fit[0].header["DATE-OBS"],"%Y-%m-%dT%H:%M:%S.%f")
 #     print(date_obs)
     exp_sec=fid_fit[0].header["EXPTIME"]
     sp_offset=fid_fit[0].header["SPCAL-O"]
@@ -198,8 +198,8 @@ for i in range(len(couples_fit_filenames)):
     
     dateobs1_str=fits.getval(fn,'DATE-OBS',0)
     dateobs2_str=fits.getval(fn,'DATE-OBS',1)
-    dateobs1=datetime.datetime.strptime(dateobs1_str,"%Y-%m-%dT%H:%M:%S")
-    dateobs2=datetime.datetime.strptime(dateobs2_str,"%Y-%m-%dT%H:%M:%S")
+    dateobs1=datetime.datetime.strptime(dateobs1_str,"%Y-%m-%dT%H:%M:%S.%f")
+    dateobs2=datetime.datetime.strptime(dateobs2_str,"%Y-%m-%dT%H:%M:%S.%f")
     dateobs1x=dates.date2num(dateobs1)
     dateobs2x=dates.date2num(dateobs2)
     
