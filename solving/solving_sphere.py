@@ -47,12 +47,11 @@ from tan_module import *
 
 # In[6]:
 
-from model_drop_fun import *
-from model_ellipsoid_fun import *
 from model_sphere_fun import *
-from model_spheroid_fun import *
-from model_spheroid_incl_fun import *
-
+#from model_spheroid_fun import *
+#from model_ellipsoid_fun import *
+#from model_spheroid_incl_fun import *
+#from model_drop_fun import *
 
 # In[86]:
 
@@ -175,6 +174,7 @@ def make_clean_pumping_scheme(pumping_scheme):
 # In[82]:
 
 def inv_problem_solve(couple_fn,model_fun,args0,out_path):
+    t=time.time()
     img1=fits.getdata(couple_fn,0)
     img2=fits.getdata(couple_fn,1)
     
@@ -361,6 +361,9 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         fid.write('NIT = '+str(res.nit)+'\n')
         fid.close()
     
+    elapsed=time.time()-t
+    print(couple_fn.split('/')[-1],' - ','SUCCESS = '+str(res.success),' STATUS = '+str(res.status),
+          ' NFEV = '+str(res.nfev),' NIT = '+str(res.nit),' - ', elapsed,' sec')
     return 0
 # t=time.time()
 # res = inv_problem_solve(couple_fn,sphere_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.)),'./sphere/')
@@ -380,9 +383,9 @@ def inv_problem_solve_spath(spath):
     couples_fit_filenames=sorted(couples_fit_filenames)
     
     for i in range(len(couples_fit_filenames)):
-        sys.stdout.write('\r')
-        sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(couples_fit_filenames)))
-        sys.stdout.flush()
+        #sys.stdout.write('\r')
+        #sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(couples_fit_filenames)))
+        #sys.stdout.flush()
 
         couple_fn=couples_fit_filenames[i]
         inv_problem_solve(couple_fn,sphere_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.)),'./sphere/')
