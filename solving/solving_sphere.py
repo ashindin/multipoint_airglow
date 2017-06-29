@@ -8,8 +8,12 @@ import os, sys, inspect
 import datetime
 import numpy as np
 import numexpr as ne
+
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import dates
+
 import scipy.optimize as so
 
 
@@ -345,7 +349,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         plt.gca().yaxis.set_major_locator(plt.NullLocator())
 
     #     plt.show()
-        plt.savefig(out_path+out_fn[0:-4]+"png", dpi = 100)    
+        plt.savefig(out_path+out_fn[0:-4]+".png", dpi = 100)    
         plt.close()
         
     else:
