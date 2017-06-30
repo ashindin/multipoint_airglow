@@ -77,7 +77,6 @@ spath="./drop/"
 if not os.path.exists(spath):
     os.makedirs(spath)
 
-
 # In[74]:
 
 def simpson(fun,a,b,n,args=()):
@@ -260,10 +259,10 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         fid.write('# '+couple_fn.split('/')[-1]+'\n')
         
         if all(denorm_x[0])>0 and all(denorm_x[1])>0: 
-			fid.write('SUCCESS = '+str(res.success)+'\n')			
+            fid.write('SUCCESS = '+str(res.success)+'\n')           
         else:
-			fid.write('SUCCESS = '+str(1)+'\n')			
-			
+            fid.write('SUCCESS = '+str(1)+'\n')         
+            
         fid.write('STATUS = '+str(res.status)+'\n')
         fid.write('NFEV = '+str(res.nfev)+'\n')
         fid.write('NIT = '+str(res.nit)+'\n')
