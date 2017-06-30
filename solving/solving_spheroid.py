@@ -1,13 +1,13 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[71]:
 
 import time
 import os, sys, inspect
 import datetime
 import numpy as np
-import numexpr as ne
+#import numexpr as ne
 
 import matplotlib
 matplotlib.use("Agg")
@@ -47,38 +47,38 @@ from tan_module import *
 
 # In[6]:
 
-from model_drop_fun import *
-from model_ellipsoid_fun import *
 from model_sphere_fun import *
-from model_spheroid_fun import *
-from model_spheroid_incl_fun import *
+#from model_spheroid_fun import *
+#from model_ellipsoid_fun import *
+#from model_spheroid_incl_fun import *
+#from model_drop_fun import *
 
-
-# In[7]:
+# In[86]:
 
 # spath="../image_processing/couples140824/"
+# couple_fn='../image_processing/couples140824/couple_140824_005.fits'
 
 
 # In[8]:
 
-# spath="./sphere/"
-# if not os.path.exists(spath):
-#     os.makedirs(spath)
+spath="./sphere/"
+if not os.path.exists(spath):
+    os.makedirs(spath)
 spath="./spheroid/"
 if not os.path.exists(spath):
     os.makedirs(spath)
-# spath="./ellipsoid/"
-# if not os.path.exists(spath):
-#     os.makedirs(spath)
-# spath="./spheroid_incl/"
-# if not os.path.exists(spath):
-#     os.makedirs(spath)
-# spath="./drop/"
-# if not os.path.exists(spath):
-#     os.makedirs(spath)
+spath="./ellipsoid/"
+if not os.path.exists(spath):
+    os.makedirs(spath)
+spath="./spheroid_incl/"
+if not os.path.exists(spath):
+    os.makedirs(spath)
+spath="./drop/"
+if not os.path.exists(spath):
+    os.makedirs(spath)
 
 
-# In[9]:
+# In[74]:
 
 def simpson(fun,a,b,n,args=()):
     h=(b-a)/n
@@ -141,7 +141,8 @@ def comparing_fun(b,model_fun,img1,img2,img1_ALT,img1_AZ,img2_ALT,img2_AZ,cam1_p
     return ret
 
 def represent_ans(x):
-    return ' '.join(("{0:.3f}".format(x[0][0]*180/np.pi), "{0:.3f}".format(x[0][1]*180/np.pi), str(int(x[0][2])), str(int(x[1][0])), str(int(x[1][1])), str(int(x[1][2]))))  
+    return ' '.join(("{0:.3f}".format(x[0][0]*180/np.pi), "{0:.3f}".format(x[0][1]*180/np.pi), str(int(x[0][2])), str(int(x[1][0])), str(int(x[1][1]))))  
+
 
 def make_clean_pumping_scheme(pumping_scheme):
     clean_pumping=[]
@@ -172,7 +173,7 @@ def make_clean_pumping_scheme(pumping_scheme):
     return date_axe, x_dates, clean_pumping
 
 
-# In[10]:
+# In[82]:
 
 def inv_problem_solve(couple_fn,model_fun,args0,out_path):
     t=time.time()
@@ -186,8 +187,28 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
     img2_exptime=fits.getval(couple_fn,'EXPTIME',1)
     
     out_fn=(img1_data_obs+datetime.timedelta(seconds=img1_exptime/2)).strftime('%y%m%d_%H%M%S_%f_'+out_path.split('/')[1]+'.dat')
-#     print(out_path+out_fn)
-#     print(out_path+out_fn[0:-4]+".png")
+    
+    prev_mod_type='sphere'
+    fn_previous='./'+prev_mod_type+'/'+(img1_data_obs+datetime.timedelta(seconds=img1_exptime/2)).strftime('%y%m%d_%H%M%S_%f_'+prev_mod_type+'.dat')
+    fid=open(fn_previous,'r')
+    fid.readline()
+    success_str=fid.readline()
+    status_str=fid.readline()
+    fid.close()
+    
+    if success_str!="SUCCESS = True\n" or status_str!="STATUS = 0\n":
+        return 1
+    
+    fid=open(fn_previous,'r')
+    fid.readline()
+    fid.readline()
+    fid.readline()
+    fid.readline()
+    fid.readline()
+    fid.readline()
+    args_prev_str=fid.readline()[0:-1]
+    args_prev=[float(ap) for ap in args_prev_str.split(' ')]
+    fid.close()
     
     img1_lat=fits.getval(couple_fn,'LAT-DEG',0)*np.pi/180
     img2_lat=fits.getval(couple_fn,'LAT-DEG',1)*np.pi/180
@@ -244,8 +265,11 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         img2=img2[325:426,175:276]
     elif img2_proj=='TAN':
         img2_AZ,img2_ALT=tan_pix2hor(img2_XPIX,img2_YPIX,img2_az0,img2_alt0,img2_a,img2_b)    
+    
+    mod_pos= (args_prev[0]*np.pi/180, args_prev[1]*np.pi/180, args_prev[2])
+    mod_args= (args_prev[3], args_prev[4], args_prev[4])
         
-    res = so.minimize(comparing_fun, normalize_args(args0[0],args0[1]), (model_fun,img1,img2,img1_ALT,img1_AZ,img2_ALT,img2_AZ,cam1_pos,cam2_pos),                       method='Nelder-Mead',options=
+    res = so.minimize(comparing_fun, normalize_args(mod_pos,mod_args), (model_fun,img1,img2,img1_ALT,img1_AZ,img2_ALT,img2_AZ,cam1_pos,cam2_pos),                       method='Nelder-Mead',options=
                       {'return_all':True,'maxiter':1000, 'maxfev':1000,'xatol': 0.0001,'fatol': 0.0001})
     
     if res.status==0 and res.success==True:
@@ -262,28 +286,34 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         denorm_x[0][1]*=180/np.pi        
         denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
         denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
-        denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2
-        
+        denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2        
         denorm_x_str=' '.join(denorm_x_str_list)
-#         denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1]), str(denorm_x[1][2])))
         fid.write(denorm_x_str+'\n\n')
         
-        for i in range(len(res.allvecs)):
-#             fid.write(represent_ans(denormalize_args(res.allvecs[i]))+'\n')        
+        for i in range(len(res.allvecs)):  
             denorm_x=denormalize_args(res.allvecs[i])
             denorm_x[0][0]*=180/np.pi
             denorm_x[0][1]*=180/np.pi        
             denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
             denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
             denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2
-#             denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1]), str(denorm_x[1][2])))
             fid.write(denorm_x_str+'\n')            
+
+        
+        #denorm_x=denormalize_args(res.x)
+        #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
+        #fid.write(denorm_x_str+'\n\n')
+        
+        #for i in range(len(res.allvecs)):
+##             fid.write(represent_ans(denormalize_args(res.allvecs[i]))+'\n')        
+            #denorm_x=denormalize_args(res.allvecs[i])
+            #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
+            #fid.write(denorm_x_str+'\n')            
         fid.close()
         
-        
         # plotting
-        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, args0[1], args0[0],cam1_pos))
-        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, args0[1] ,args0[0],cam2_pos))
+        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_x[1], [denorm_x[0][0]*np.pi/180, denorm_x[0][1]*np.pi/180, denorm_x[0][2]],cam1_pos))
+        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_x[1], [denorm_x[0][0]*np.pi/180, denorm_x[0][1]*np.pi/180, denorm_x[0][2]],cam2_pos))
         
         img1_data_obs_x=dates.date2num(img1_data_obs)
         img2_data_obs_x=dates.date2num(img2_data_obs)
@@ -326,7 +356,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         CS1 = plt.contour(m1, 2, colors='k')
         plt.clabel(CS1, fontsize=9, inline=1,fmt='%1.1f')
 
-        plt.title("KEO: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
+        plt.title("CAM1: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
         plt.title("SP_OFFSET: " + "{:4.2f}".format(img1_spcalo),loc='right')
         ax1.set_ylim(101,0)
         ax1.set_xlim(101,0)
@@ -338,7 +368,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         pcm2=plt.pcolormesh(np.fliplr(img2),vmin=vmin,vmax=vmax)
         CS2 = plt.contour(np.fliplr(m2), 2, colors='k')
         plt.clabel(CS2, fontsize=9, inline=1,fmt='%1.1f')
-        plt.title("S1C: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
+        plt.title("CAM2: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
         plt.title("SP_OFFSET: " + "{:4.2f}".format(img2_spcalo),loc='right')    
         ax2.set_ylim(img2.shape[0],0)
     #     ax2.set_xlim(0,img2.shape[1])
@@ -378,15 +408,14 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         fid.close()
     
     elapsed=time.time()-t
-    print(couple_fn.split('/')[-1],' - ','SUCCESS = '+str(res.success),' STATUS = '+str(res.status),
-          ' NFEV = '+str(res.nfev),' NIT = '+str(res.nit),' - ', elapsed,' sec')
-    
+    print(couple_fn.split('/')[-1],'-','SUCCESS = '+str(res.success),'STATUS = '+str(res.status),
+          'NFEV = '+str(res.nfev),'NIT = '+str(res.nit),'-', elapsed,' sec')
     return 0
-# couple_fn='../image_processing/couples140824/couple_140824_005.fits'
 # t=time.time()
 # res = inv_problem_solve(couple_fn,sphere_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.)),'./sphere/')
 # elapsed=time.time()-t
 # print(elapsed)
+# res
 
 
 # In[ ]:
@@ -400,9 +429,9 @@ def inv_problem_solve_spath(spath):
     couples_fit_filenames=sorted(couples_fit_filenames)
     
     for i in range(len(couples_fit_filenames)):
-#         sys.stdout.write('\r')
-#         sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(couples_fit_filenames)))
-#         sys.stdout.flush()
+        #sys.stdout.write('\r')
+        #sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(couples_fit_filenames)))
+        #sys.stdout.flush()
 
         couple_fn=couples_fit_filenames[i]
         inv_problem_solve(couple_fn,sphere_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.,19000.)),'./spheroid/')

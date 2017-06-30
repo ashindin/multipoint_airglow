@@ -255,19 +255,36 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         fid.write('FUN = '+str(res.fun)+'\n')
         
         denorm_x=denormalize_args(res.x)
-        denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
+        denorm_x[0][0]*=180/np.pi
+        denorm_x[0][1]*=180/np.pi        
+        denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
+        denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
+        denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2        
+        denorm_x_str=' '.join(denorm_x_str_list)
         fid.write(denorm_x_str+'\n\n')
         
-        for i in range(len(res.allvecs)):
-#             fid.write(represent_ans(denormalize_args(res.allvecs[i]))+'\n')        
+        for i in range(len(res.allvecs)):  
             denorm_x=denormalize_args(res.allvecs[i])
-            denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
-            fid.write(denorm_x_str+'\n')            
+            denorm_x[0][0]*=180/np.pi
+            denorm_x[0][1]*=180/np.pi        
+            denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
+            denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
+            denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2
+            fid.write(denorm_x_str+'\n')
+        #denorm_x=denormalize_args(res.x)
+        #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
+        #fid.write(denorm_x_str+'\n\n')
+        
+        #for i in range(len(res.allvecs)):
+##             fid.write(represent_ans(denormalize_args(res.allvecs[i]))+'\n')        
+            #denorm_x=denormalize_args(res.allvecs[i])
+            #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
+            #fid.write(denorm_x_str+'\n')            
         fid.close()
         
         # plotting
-        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, args0[1], args0[0],cam1_pos))
-        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, args0[1] ,args0[0],cam2_pos))
+        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_x[1], denorm_x[0],cam1_pos))
+        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_x[1], denorm_x[0],cam2_pos))
         
         img1_data_obs_x=dates.date2num(img1_data_obs)
         img2_data_obs_x=dates.date2num(img2_data_obs)
@@ -310,7 +327,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         CS1 = plt.contour(m1, 2, colors='k')
         plt.clabel(CS1, fontsize=9, inline=1,fmt='%1.1f')
 
-        plt.title("KEO: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
+        plt.title("CAM1: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
         plt.title("SP_OFFSET: " + "{:4.2f}".format(img1_spcalo),loc='right')
         ax1.set_ylim(101,0)
         ax1.set_xlim(101,0)
@@ -322,7 +339,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         pcm2=plt.pcolormesh(np.fliplr(img2),vmin=vmin,vmax=vmax)
         CS2 = plt.contour(np.fliplr(m2), 2, colors='k')
         plt.clabel(CS2, fontsize=9, inline=1,fmt='%1.1f')
-        plt.title("S1C: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
+        plt.title("CAM2: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
         plt.title("SP_OFFSET: " + "{:4.2f}".format(img2_spcalo),loc='right')    
         ax2.set_ylim(img2.shape[0],0)
     #     ax2.set_xlim(0,img2.shape[1])
