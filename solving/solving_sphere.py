@@ -248,6 +248,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         fid=open(out_path+out_fn,'w')
 
         
+        denorm_res=denormalize_args(res.x)
         denorm_x=denormalize_args(res.x)
         denorm_x[0][0]*=180/np.pi
         denorm_x[0][1]*=180/np.pi        
@@ -277,12 +278,13 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
             denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
             denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
             denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2
+            denorm_x_str=' '.join(denorm_x_str_list)
             fid.write(denorm_x_str+'\n')         
         fid.close()
         
         # plotting
-        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_x[1], denorm_x[0],cam1_pos))
-        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_x[1], denorm_x[0],cam2_pos))
+        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_res[1], denorm_res[0],cam1_pos))
+        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_res[1], denorm_res[0],cam2_pos))
         
         img1_data_obs_x=dates.date2num(img1_data_obs)
         img2_data_obs_x=dates.date2num(img2_data_obs)
