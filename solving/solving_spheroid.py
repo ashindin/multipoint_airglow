@@ -47,8 +47,8 @@ from tan_module import *
 
 # In[6]:
 
-from model_sphere_fun import *
-#from model_spheroid_fun import *
+#from model_sphere_fun import *
+from model_spheroid_fun import *
 #from model_ellipsoid_fun import *
 #from model_spheroid_incl_fun import *
 #from model_drop_fun import *
@@ -434,7 +434,7 @@ def inv_problem_solve_spath(spath):
         #sys.stdout.flush()
 
         couple_fn=couples_fit_filenames[i]
-        inv_problem_solve(couple_fn,sphere_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.,19000.)),'./spheroid/')
+        inv_problem_solve(couple_fn,spheroid_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.,19000.)),'./spheroid/')
     return None
 
 
