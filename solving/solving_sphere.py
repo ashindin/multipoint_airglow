@@ -259,11 +259,11 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         
         fid.write('# '+couple_fn.split('/')[-1]+'\n')
         
-        if all(denorm_x[0])>0 and all(denorm_x[1])>0: 
+        if all([dx>0 for dx in denorm_x[0]])>0 and all([dx>0 for dx in denorm_x[1]])>0: 
             fid.write('SUCCESS = '+str(res.success)+'\n')           
             plot_flag=1
         else:
-            fid.write('SUCCESS = '+str(1)+'\n')
+            fid.write('SUCCESS = '+'False'+'\n')
             plot_flag=0         
             
         fid.write('STATUS = '+str(res.status)+'\n')
