@@ -247,12 +247,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
     
     if res.status==0 and res.success==True:
         fid=open(out_path+out_fn,'w')
-        fid.write('# '+couple_fn.split('/')[-1]+'\n')
-        fid.write('SUCCESS = '+str(res.success)+'\n')        
-        fid.write('STATUS = '+str(res.status)+'\n')
-        fid.write('NFEV = '+str(res.nfev)+'\n')
-        fid.write('NIT = '+str(res.nit)+'\n')
-        fid.write('FUN = '+str(res.fun)+'\n')
+
         
         denorm_x=denormalize_args(res.x)
         denorm_x[0][0]*=180/np.pi
@@ -261,6 +256,19 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
         denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2        
         denorm_x_str=' '.join(denorm_x_str_list)
+        
+        fid.write('# '+couple_fn.split('/')[-1]+'\n')
+        
+        if all(denorm_x[0])>0 and all(denorm_x[1])>0: 
+			fid.write('SUCCESS = '+str(res.success)+'\n')			
+        else:
+			fid.write('SUCCESS = '+str(1)+'\n')			
+			
+        fid.write('STATUS = '+str(res.status)+'\n')
+        fid.write('NFEV = '+str(res.nfev)+'\n')
+        fid.write('NIT = '+str(res.nit)+'\n')
+        fid.write('FUN = '+str(res.fun)+'\n')
+                
         fid.write(denorm_x_str+'\n\n')
         
         for i in range(len(res.allvecs)):  
@@ -270,16 +278,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
             denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
             denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
             denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2
-            fid.write(denorm_x_str+'\n')
-        #denorm_x=denormalize_args(res.x)
-        #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
-        #fid.write(denorm_x_str+'\n\n')
-        
-        #for i in range(len(res.allvecs)):
-##             fid.write(represent_ans(denormalize_args(res.allvecs[i]))+'\n')        
-            #denorm_x=denormalize_args(res.allvecs[i])
-            #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
-            #fid.write(denorm_x_str+'\n')            
+            fid.write(denorm_x_str+'\n')         
         fid.close()
         
         # plotting
