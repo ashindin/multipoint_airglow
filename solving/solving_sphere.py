@@ -261,8 +261,10 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         
         if all(denorm_x[0])>0 and all(denorm_x[1])>0: 
             fid.write('SUCCESS = '+str(res.success)+'\n')           
+            plot_flag=1
         else:
-            fid.write('SUCCESS = '+str(1)+'\n')         
+            fid.write('SUCCESS = '+str(1)+'\n')
+            plot_flag=0         
             
         fid.write('STATUS = '+str(res.status)+'\n')
         fid.write('NFEV = '+str(res.nfev)+'\n')
@@ -283,91 +285,92 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         fid.close()
         
         # plotting
-        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_res[1], denorm_res[0],cam1_pos))
-        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_res[1], denorm_res[0],cam2_pos))
-        
-        img1_data_obs_x=dates.date2num(img1_data_obs)
-        img2_data_obs_x=dates.date2num(img2_data_obs)
-        img1_data_end_x=dates.date2num(img1_data_obs+datetime.timedelta(seconds=img1_exptime))
-        img2_data_end_x=dates.date2num(img2_data_obs+datetime.timedelta(seconds=img2_exptime))
-        img1_spcalo=fits.getval(couple_fn,'SPCAL-O',0)
-        img2_spcalo=fits.getval(couple_fn,'SPCAL-O',1)
-
-        pumping_scheme_str_list=[]
-        s_i=0
-        while True:
-            try:
-                temp=fits.getval(couple_fn,'P-SCH-'+str(s_i),0)
-            except:
-                break
-            pumping_scheme_str_list.append(temp)
-            s_i+=1
-
-        pumping_scheme=[]
-        for i in range(len(pumping_scheme_str_list)):
-            ps_str=pumping_scheme_str_list[i]
-            ps_str_list=ps_str.split(',')
-            ds=datetime.datetime.strptime(ps_str_list[0],"%Y-%m-%dT%H:%M:%S")
-            tau=float(ps_str_list[1].split(' min')[0])
-            T=float(ps_str_list[2].split(' min')[0])
-            N=float(ps_str_list[3])
-            V=float(ps_str_list[4])
-            F=float(ps_str_list[5].split(' kHz')[0])
-            pumping_scheme.append([ds,tau,T,N,V,F])
-
-        date_axe_clean, x_dates_clean, clean_pumping = make_clean_pumping_scheme(pumping_scheme)
-
-        vmin=-15
-        vmax=15
-        fig=plt.figure(figsize=(12.8,7.2))
-        fig.set_size_inches(12.8, 7.2)
-        dx=0.05
-        ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])    
-        pcm1=plt.pcolormesh(img1,vmin=vmin,vmax=vmax)    
-        CS1 = plt.contour(m1, 2, colors='k')
-        plt.clabel(CS1, fontsize=9, inline=1,fmt='%1.1f')
-
-        plt.title("CAM1: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
-        plt.title("SP_OFFSET: " + "{:4.2f}".format(img1_spcalo),loc='right')
-        ax1.set_ylim(101,0)
-        ax1.set_xlim(101,0)
-        plt.axis('equal')
-        ax1_cb=plt.axes(position=[0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
-        plt.colorbar(pcm1,ax1_cb)
-
-        ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
-        pcm2=plt.pcolormesh(np.fliplr(img2),vmin=vmin,vmax=vmax)
-        CS2 = plt.contour(np.fliplr(m2), 2, colors='k')
-        plt.clabel(CS2, fontsize=9, inline=1,fmt='%1.1f')
-        plt.title("CAM2: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
-        plt.title("SP_OFFSET: " + "{:4.2f}".format(img2_spcalo),loc='right')    
-        ax2.set_ylim(img2.shape[0],0)
-    #     ax2.set_xlim(0,img2.shape[1])
-        ax2.set_xlim(img2.shape[1],0)
-        plt.axis('equal')
-        ax2_cb=plt.axes(position=[0.485+0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
-        plt.colorbar(pcm2,ax2_cb)
-
-        ax3=plt.axes(position=[0.035000000000000003+dx/2, 0.05, 0.907, 0.17])
-        xlim_left=img1_data_obs_x-12/60/24 #
-        xlim_right=img1_data_obs_x+12/60/24 #
-        ax3.set_xlim(xlim_left,xlim_right) 
-        ax3.set_ylim(0,1.)
-        ax3.xaxis.set_major_locator(dates.MinuteLocator(byminute=range(1,61,3)))
-        ax3.xaxis.set_minor_locator(dates.MinuteLocator(byminute=range(4,64,3)))
-        xfmt = dates.DateFormatter('%H:%M')
-        ax3.xaxis.set_major_formatter(xfmt)
-        for i in range(len(clean_pumping)):
-            plt.plot(x_dates_clean[i],clean_pumping[i]*0.9,'r')
-
-        plt.plot([img1_data_obs_x, img1_data_end_x],[0.95,0.95],'b',lw=3) #
-        plt.plot([img2_data_obs_x, img2_data_end_x],[0.92,0.92],'g',lw=3) #
-        plt.grid()
-        plt.gca().yaxis.set_major_locator(plt.NullLocator())
-
-    #     plt.show()
-        plt.savefig(out_path+out_fn[0:-4]+".png", dpi = 100)    
-        plt.close()
+        if plot_flag==1:
+            m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_res[1], denorm_res[0],cam1_pos))
+            m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_res[1], denorm_res[0],cam2_pos))
+            
+            img1_data_obs_x=dates.date2num(img1_data_obs)
+            img2_data_obs_x=dates.date2num(img2_data_obs)
+            img1_data_end_x=dates.date2num(img1_data_obs+datetime.timedelta(seconds=img1_exptime))
+            img2_data_end_x=dates.date2num(img2_data_obs+datetime.timedelta(seconds=img2_exptime))
+            img1_spcalo=fits.getval(couple_fn,'SPCAL-O',0)
+            img2_spcalo=fits.getval(couple_fn,'SPCAL-O',1)
+    
+            pumping_scheme_str_list=[]
+            s_i=0
+            while True:
+                try:
+                    temp=fits.getval(couple_fn,'P-SCH-'+str(s_i),0)
+                except:
+                    break
+                pumping_scheme_str_list.append(temp)
+                s_i+=1
+    
+            pumping_scheme=[]
+            for i in range(len(pumping_scheme_str_list)):
+                ps_str=pumping_scheme_str_list[i]
+                ps_str_list=ps_str.split(',')
+                ds=datetime.datetime.strptime(ps_str_list[0],"%Y-%m-%dT%H:%M:%S")
+                tau=float(ps_str_list[1].split(' min')[0])
+                T=float(ps_str_list[2].split(' min')[0])
+                N=float(ps_str_list[3])
+                V=float(ps_str_list[4])
+                F=float(ps_str_list[5].split(' kHz')[0])
+                pumping_scheme.append([ds,tau,T,N,V,F])
+    
+            date_axe_clean, x_dates_clean, clean_pumping = make_clean_pumping_scheme(pumping_scheme)
+    
+            vmin=-15
+            vmax=15
+            fig=plt.figure(figsize=(12.8,7.2))
+            fig.set_size_inches(12.8, 7.2)
+            dx=0.05
+            ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])    
+            pcm1=plt.pcolormesh(img1,vmin=vmin,vmax=vmax)    
+            CS1 = plt.contour(m1, 2, colors='k')
+            plt.clabel(CS1, fontsize=9, inline=1,fmt='%1.1f')
+    
+            plt.title("CAM1: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
+            plt.title("SP_OFFSET: " + "{:4.2f}".format(img1_spcalo),loc='right')
+            ax1.set_ylim(101,0)
+            ax1.set_xlim(101,0)
+            plt.axis('equal')
+            ax1_cb=plt.axes(position=[0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
+            plt.colorbar(pcm1,ax1_cb)
+    
+            ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
+            pcm2=plt.pcolormesh(np.fliplr(img2),vmin=vmin,vmax=vmax)
+            CS2 = plt.contour(np.fliplr(m2), 2, colors='k')
+            plt.clabel(CS2, fontsize=9, inline=1,fmt='%1.1f')
+            plt.title("CAM2: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
+            plt.title("SP_OFFSET: " + "{:4.2f}".format(img2_spcalo),loc='right')    
+            ax2.set_ylim(img2.shape[0],0)
+        #     ax2.set_xlim(0,img2.shape[1])
+            ax2.set_xlim(img2.shape[1],0)
+            plt.axis('equal')
+            ax2_cb=plt.axes(position=[0.485+0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
+            plt.colorbar(pcm2,ax2_cb)
+    
+            ax3=plt.axes(position=[0.035000000000000003+dx/2, 0.05, 0.907, 0.17])
+            xlim_left=img1_data_obs_x-12/60/24 #
+            xlim_right=img1_data_obs_x+12/60/24 #
+            ax3.set_xlim(xlim_left,xlim_right) 
+            ax3.set_ylim(0,1.)
+            ax3.xaxis.set_major_locator(dates.MinuteLocator(byminute=range(1,61,3)))
+            ax3.xaxis.set_minor_locator(dates.MinuteLocator(byminute=range(4,64,3)))
+            xfmt = dates.DateFormatter('%H:%M')
+            ax3.xaxis.set_major_formatter(xfmt)
+            for i in range(len(clean_pumping)):
+                plt.plot(x_dates_clean[i],clean_pumping[i]*0.9,'r')
+    
+            plt.plot([img1_data_obs_x, img1_data_end_x],[0.95,0.95],'b',lw=3) #
+            plt.plot([img2_data_obs_x, img2_data_end_x],[0.92,0.92],'g',lw=3) #
+            plt.grid()
+            plt.gca().yaxis.set_major_locator(plt.NullLocator())
+    
+        #     plt.show()
+            plt.savefig(out_path+out_fn[0:-4]+".png", dpi = 100)    
+            plt.close()
         
     else:
         fid=open(out_path+out_fn,'w')
@@ -379,8 +382,8 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         fid.close()
     
     elapsed=time.time()-t
-    print(couple_fn.split('/')[-1],' - ','SUCCESS = '+str(res.success),' STATUS = '+str(res.status),
-          ' NFEV = '+str(res.nfev),' NIT = '+str(res.nit),' - ', elapsed,' sec')
+    print(couple_fn.split('/')[-1],'-','SUCCESS = '+str(res.success),'STATUS = '+str(res.status),
+          'NFEV = '+str(res.nfev),'NIT = '+str(res.nit),'-', elapsed,'sec')
     return 0
 # t=time.time()
 # res = inv_problem_solve(couple_fn,sphere_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.)),'./sphere/')
