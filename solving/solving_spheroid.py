@@ -412,7 +412,18 @@ def inv_problem_solve(couple_fn,model_fun,out_path):
         fid.write('SUCCESS = '+str(res.success)+'\n')        
         fid.write('STATUS = '+str(res.status)+'\n')
         fid.write('NFEV = '+str(res.nfev)+'\n')
-        fid.write('NIT = '+str(res.nit)+'\n')
+        fid.write('NIT = '+str(res.nit)+'\n\n')
+        
+        for i in range(len(res.allvecs)):  
+            denorm_x=denormalize_args(res.allvecs[i])
+            denorm_x[0][0]*=180/np.pi
+            denorm_x[0][1]*=180/np.pi        
+            denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
+            denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
+            denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2
+            denorm_x_str=' '.join(denorm_x_str_list)
+            fid.write(denorm_x_str+'\n')
+        
         fid.close()
     
     elapsed=time.time()-t
