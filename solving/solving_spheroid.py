@@ -7,7 +7,7 @@ import time
 import os, sys, inspect
 import datetime
 import numpy as np
-#import numexpr as ne
+import numexpr as ne
 
 import matplotlib
 matplotlib.use("Agg")
@@ -55,10 +55,6 @@ from model_spheroid_fun import *
 
 # In[86]:
 
-# spath="../image_processing/couples140824/"
-# couple_fn='../image_processing/couples140824/couple_140824_005.fits'
-
-
 # In[8]:
 
 spath="./sphere/"
@@ -76,7 +72,6 @@ if not os.path.exists(spath):
 spath="./drop/"
 if not os.path.exists(spath):
     os.makedirs(spath)
-
 
 # In[74]:
 
@@ -172,10 +167,103 @@ def make_clean_pumping_scheme(pumping_scheme):
         x_dates.append(x_dates_ps)
     return date_axe, x_dates, clean_pumping
 
+def plotting(couple_fn,img1,img2,m1,m2,img1_data_obs,img2_data_obs,img1_exptime,img2_exptime,out_path,out_fn):
+    # plotting
+    img1_data_obs_x=dates.date2num(img1_data_obs)
+    img2_data_obs_x=dates.date2num(img2_data_obs)
+    img1_data_end_x=dates.date2num(img1_data_obs+datetime.timedelta(seconds=img1_exptime))
+    img2_data_end_x=dates.date2num(img2_data_obs+datetime.timedelta(seconds=img2_exptime))
+    img1_spcalo=fits.getval(couple_fn,'SPCAL-O',0)
+    img2_spcalo=fits.getval(couple_fn,'SPCAL-O',1)
 
+    pumping_scheme_str_list=[]
+    s_i=0
+    while True:
+        try:
+            temp=fits.getval(couple_fn,'P-SCH-'+str(s_i),0)
+        except:
+            break
+        pumping_scheme_str_list.append(temp)
+        s_i+=1
+
+    pumping_scheme=[]
+    for i in range(len(pumping_scheme_str_list)):
+        ps_str=pumping_scheme_str_list[i]
+        ps_str_list=ps_str.split(',')
+        ds=datetime.datetime.strptime(ps_str_list[0],"%Y-%m-%dT%H:%M:%S")
+        tau=float(ps_str_list[1].split(' min')[0])
+        T=float(ps_str_list[2].split(' min')[0])
+        N=float(ps_str_list[3])
+        V=float(ps_str_list[4])
+        F=float(ps_str_list[5].split(' kHz')[0])
+        pumping_scheme.append([ds,tau,T,N,V,F])
+
+    date_axe_clean, x_dates_clean, clean_pumping = make_clean_pumping_scheme(pumping_scheme)
+
+    vmin=-15
+    vmax=15
+    fig=plt.figure(figsize=(12.8,7.2))
+    fig.set_size_inches(12.8, 7.2)
+    dx=0.05
+    ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])    
+    pcm1=plt.pcolormesh(img1,vmin=vmin,vmax=vmax)    
+    
+    ret=0
+    try:
+        CS1 = plt.contour(m1, 2, colors='k')    
+        plt.clabel(CS1, fontsize=9, inline=1,fmt='%1.1f')
+    except:
+        ret=1
+
+    plt.title("CAM1: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
+    plt.title("SP_OFFSET: " + "{:4.2f}".format(img1_spcalo),loc='right')
+    ax1.set_ylim(101,0)
+    ax1.set_xlim(101,0)
+    plt.axis('equal')
+    ax1_cb=plt.axes(position=[0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
+    plt.colorbar(pcm1,ax1_cb)
+
+    ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
+    pcm2=plt.pcolormesh(np.fliplr(img2),vmin=vmin,vmax=vmax)
+    try:
+        CS2 = plt.contour(np.fliplr(m2), 2, colors='k')
+        plt.clabel(CS2, fontsize=9, inline=1,fmt='%1.1f')
+    except:
+        ret=1
+    plt.title("CAM2: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
+    plt.title("SP_OFFSET: " + "{:4.2f}".format(img2_spcalo),loc='right')    
+    ax2.set_ylim(img2.shape[0],0)
+#     ax2.set_xlim(0,img2.shape[1])
+    ax2.set_xlim(img2.shape[1],0)
+    plt.axis('equal')
+    ax2_cb=plt.axes(position=[0.485+0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
+    plt.colorbar(pcm2,ax2_cb)
+
+    ax3=plt.axes(position=[0.035000000000000003+dx/2, 0.05, 0.907, 0.17])
+    xlim_left=img1_data_obs_x-12/60/24 #
+    xlim_right=img1_data_obs_x+12/60/24 #
+    ax3.set_xlim(xlim_left,xlim_right) 
+    ax3.set_ylim(0,1.)
+    ax3.xaxis.set_major_locator(dates.MinuteLocator(byminute=range(1,61,3)))
+    ax3.xaxis.set_minor_locator(dates.MinuteLocator(byminute=range(4,64,3)))
+    xfmt = dates.DateFormatter('%H:%M')
+    ax3.xaxis.set_major_formatter(xfmt)
+    for i in range(len(clean_pumping)):
+        plt.plot(x_dates_clean[i],clean_pumping[i]*0.9,'r')
+
+        plt.plot([img1_data_obs_x, img1_data_end_x],[0.95,0.95],'b',lw=3) #
+        plt.plot([img2_data_obs_x, img2_data_end_x],[0.92,0.92],'g',lw=3) #
+        plt.grid()
+        plt.gca().yaxis.set_major_locator(plt.NullLocator())
+
+#     plt.show()
+    plt.savefig(out_path+out_fn[0:-4]+".png", dpi = 100)    
+    plt.close()
+
+    return ret
 # In[82]:
 
-def inv_problem_solve(couple_fn,model_fun,args0,out_path):
+def inv_problem_solve(couple_fn,model_fun,out_path):
     t=time.time()
     img1=fits.getdata(couple_fn,0)
     img2=fits.getdata(couple_fn,1)
@@ -268,19 +356,15 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
     
     mod_pos= (args_prev[0]*np.pi/180, args_prev[1]*np.pi/180, args_prev[2])
     mod_args= (args_prev[3], args_prev[4], args_prev[4])
-        
+    
     res = so.minimize(comparing_fun, normalize_args(mod_pos,mod_args), (model_fun,img1,img2,img1_ALT,img1_AZ,img2_ALT,img2_AZ,cam1_pos,cam2_pos),                       method='Nelder-Mead',options=
                       {'return_all':True,'maxiter':1000, 'maxfev':1000,'xatol': 0.0001,'fatol': 0.0001})
     
     if res.status==0 and res.success==True:
         fid=open(out_path+out_fn,'w')
-        fid.write('# '+couple_fn.split('/')[-1]+'\n')
-        fid.write('SUCCESS = '+str(res.success)+'\n')        
-        fid.write('STATUS = '+str(res.status)+'\n')
-        fid.write('NFEV = '+str(res.nfev)+'\n')
-        fid.write('NIT = '+str(res.nit)+'\n')
-        fid.write('FUN = '+str(res.fun)+'\n')
+
         
+        denorm_res=denormalize_args(res.x)
         denorm_x=denormalize_args(res.x)
         denorm_x[0][0]*=180/np.pi
         denorm_x[0][1]*=180/np.pi        
@@ -288,6 +372,27 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
         denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2        
         denorm_x_str=' '.join(denorm_x_str_list)
+        
+        fid.write('# '+couple_fn.split('/')[-1]+'\n')
+        
+        if all([dx>0 for dx in denorm_x[0]])>0 and all([dx>0 for dx in denorm_x[1]])>0: 
+
+            m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_res[1], denorm_res[0],cam1_pos))
+            m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_res[1], denorm_res[0],cam2_pos))
+            plot_ret = plotting(couple_fn,img1,img2,m1,m2,img1_data_obs,img2_data_obs,img1_exptime,img2_exptime,out_path,out_fn)
+            if plot_ret==0:                
+                fid.write('SUCCESS = '+str(res.success)+'\n')
+            else:
+                fid.write('SUCCESS = '+'False'+'\n')
+
+        else:
+            fid.write('SUCCESS = '+'False'+'\n')         
+            
+        fid.write('STATUS = '+str(res.status)+'\n')
+        fid.write('NFEV = '+str(res.nfev)+'\n')
+        fid.write('NIT = '+str(res.nit)+'\n')
+        fid.write('FUN = '+str(res.fun)+'\n')
+                
         fid.write(denorm_x_str+'\n\n')
         
         for i in range(len(res.allvecs)):  
@@ -297,106 +402,9 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
             denorm_x_str_list1=[str(dx) for dx in denorm_x[0]]
             denorm_x_str_list2=[str(dx) for dx in denorm_x[1]]
             denorm_x_str_list=denorm_x_str_list1+denorm_x_str_list2
-            fid.write(denorm_x_str+'\n')            
-
-        
-        #denorm_x=denormalize_args(res.x)
-        #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
-        #fid.write(denorm_x_str+'\n\n')
-        
-        #for i in range(len(res.allvecs)):
-##             fid.write(represent_ans(denormalize_args(res.allvecs[i]))+'\n')        
-            #denorm_x=denormalize_args(res.allvecs[i])
-            #denorm_x_str=' '.join((str(denorm_x[0][0]*180/np.pi), str(denorm_x[0][1]*180/np.pi), str(denorm_x[0][2]), str(denorm_x[1][0]), str(denorm_x[1][1])))
-            #fid.write(denorm_x_str+'\n')            
+            denorm_x_str=' '.join(denorm_x_str_list)
+            fid.write(denorm_x_str+'\n')         
         fid.close()
-        
-        # plotting
-        m1=simpson(model_fun,200000.,400000.,100,(img1_ALT,img1_AZ, denorm_x[1], [denorm_x[0][0]*np.pi/180, denorm_x[0][1]*np.pi/180, denorm_x[0][2]],cam1_pos))
-        m2=simpson(model_fun,150000.,350000.,100,(img2_ALT,img2_AZ, denorm_x[1], [denorm_x[0][0]*np.pi/180, denorm_x[0][1]*np.pi/180, denorm_x[0][2]],cam2_pos))
-        
-        img1_data_obs_x=dates.date2num(img1_data_obs)
-        img2_data_obs_x=dates.date2num(img2_data_obs)
-        img1_data_end_x=dates.date2num(img1_data_obs+datetime.timedelta(seconds=img1_exptime))
-        img2_data_end_x=dates.date2num(img2_data_obs+datetime.timedelta(seconds=img2_exptime))
-        img1_spcalo=fits.getval(couple_fn,'SPCAL-O',0)
-        img2_spcalo=fits.getval(couple_fn,'SPCAL-O',1)
-
-        pumping_scheme_str_list=[]
-        s_i=0
-        while True:
-            try:
-                temp=fits.getval(couple_fn,'P-SCH-'+str(s_i),0)
-            except:
-                break
-            pumping_scheme_str_list.append(temp)
-            s_i+=1
-
-        pumping_scheme=[]
-        for i in range(len(pumping_scheme_str_list)):
-            ps_str=pumping_scheme_str_list[i]
-            ps_str_list=ps_str.split(',')
-            ds=datetime.datetime.strptime(ps_str_list[0],"%Y-%m-%dT%H:%M:%S")
-            tau=float(ps_str_list[1].split(' min')[0])
-            T=float(ps_str_list[2].split(' min')[0])
-            N=float(ps_str_list[3])
-            V=float(ps_str_list[4])
-            F=float(ps_str_list[5].split(' kHz')[0])
-            pumping_scheme.append([ds,tau,T,N,V,F])
-
-        date_axe_clean, x_dates_clean, clean_pumping = make_clean_pumping_scheme(pumping_scheme)
-
-        vmin=-15
-        vmax=15
-        fig=plt.figure(figsize=(12.8,7.2))
-        fig.set_size_inches(12.8, 7.2)
-        dx=0.05
-        ax1=plt.axes(position=[0.035000000000000003+dx/2, 0.26, 0.4, 0.7])    
-        pcm1=plt.pcolormesh(img1,vmin=vmin,vmax=vmax)    
-        CS1 = plt.contour(m1, 2, colors='k')
-        plt.clabel(CS1, fontsize=9, inline=1,fmt='%1.1f')
-
-        plt.title("CAM1: "+ img1_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"), loc='left')
-        plt.title("SP_OFFSET: " + "{:4.2f}".format(img1_spcalo),loc='right')
-        ax1.set_ylim(101,0)
-        ax1.set_xlim(101,0)
-        plt.axis('equal')
-        ax1_cb=plt.axes(position=[0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
-        plt.colorbar(pcm1,ax1_cb)
-
-        ax2=plt.axes(position=[0.485+0.035000000000000003+dx/2, 0.26, 0.4, 0.7])
-        pcm2=plt.pcolormesh(np.fliplr(img2),vmin=vmin,vmax=vmax)
-        CS2 = plt.contour(np.fliplr(m2), 2, colors='k')
-        plt.clabel(CS2, fontsize=9, inline=1,fmt='%1.1f')
-        plt.title("CAM2: "+ img2_data_obs.strftime("%Y-%m-%dT%H:%M:%S.%f"),loc='left')
-        plt.title("SP_OFFSET: " + "{:4.2f}".format(img2_spcalo),loc='right')    
-        ax2.set_ylim(img2.shape[0],0)
-    #     ax2.set_xlim(0,img2.shape[1])
-        ax2.set_xlim(img2.shape[1],0)
-        plt.axis('equal')
-        ax2_cb=plt.axes(position=[0.485+0.035000000000000003+dx/2+0.4+0.008, 0.26, 0.015, 0.7])
-        plt.colorbar(pcm2,ax2_cb)
-
-        ax3=plt.axes(position=[0.035000000000000003+dx/2, 0.05, 0.907, 0.17])
-        xlim_left=img1_data_obs_x-12/60/24 #
-        xlim_right=img1_data_obs_x+12/60/24 #
-        ax3.set_xlim(xlim_left,xlim_right) 
-        ax3.set_ylim(0,1.)
-        ax3.xaxis.set_major_locator(dates.MinuteLocator(byminute=range(1,61,3)))
-        ax3.xaxis.set_minor_locator(dates.MinuteLocator(byminute=range(4,64,3)))
-        xfmt = dates.DateFormatter('%H:%M')
-        ax3.xaxis.set_major_formatter(xfmt)
-        for i in range(len(clean_pumping)):
-            plt.plot(x_dates_clean[i],clean_pumping[i]*0.9,'r')
-
-        plt.plot([img1_data_obs_x, img1_data_end_x],[0.95,0.95],'b',lw=3) #
-        plt.plot([img2_data_obs_x, img2_data_end_x],[0.92,0.92],'g',lw=3) #
-        plt.grid()
-        plt.gca().yaxis.set_major_locator(plt.NullLocator())
-
-    #     plt.show()
-        plt.savefig(out_path+out_fn[0:-4]+".png", dpi = 100)    
-        plt.close()
         
     else:
         fid=open(out_path+out_fn,'w')
@@ -409,7 +417,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
     
     elapsed=time.time()-t
     print(couple_fn.split('/')[-1],'-','SUCCESS = '+str(res.success),'STATUS = '+str(res.status),
-          'NFEV = '+str(res.nfev),'NIT = '+str(res.nit),'-', elapsed,' sec')
+          'NFEV = '+str(res.nfev),'NIT = '+str(res.nit),'-', elapsed,'sec')
     return 0
 # t=time.time()
 # res = inv_problem_solve(couple_fn,sphere_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.)),'./sphere/')
@@ -429,12 +437,13 @@ def inv_problem_solve_spath(spath):
     couples_fit_filenames=sorted(couples_fit_filenames)
     
     for i in range(len(couples_fit_filenames)):
+    #for i in range(0,1):
         #sys.stdout.write('\r')
         #sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(couples_fit_filenames)))
         #sys.stdout.flush()
 
         couple_fn=couples_fit_filenames[i]
-        inv_problem_solve(couple_fn,spheroid_fun,((56.1434444*np.pi/180,46.0991056*np.pi/180,230000.),(850,19000.,19000.)),'./spheroid/')
+        inv_problem_solve(couple_fn,spheroid_fun,'./spheroid/')
     return None
 
 
