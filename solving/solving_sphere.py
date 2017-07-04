@@ -278,6 +278,16 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
     
     out_fn=(img1_data_obs+datetime.timedelta(seconds=img1_exptime/2)).strftime('%y%m%d_%H%M%S_%f_'+out_path.split('/')[1]+'.dat')
     
+    if  os.path.exists(out_path+out_fn):
+        fid=open(out_path+out_fn,'r')
+        fid.readline()
+        success_str=fid.readline()
+        status_str=fid.readline()
+        fid.close()
+        if success_str=="SUCCESS = True\n" or status_str=="STATUS = 0\n":
+			print("Skip",couple_fn)
+            return 1
+    
     img1_lat=fits.getval(couple_fn,'LAT-DEG',0)*np.pi/180
     img2_lat=fits.getval(couple_fn,'LAT-DEG',1)*np.pi/180
     img1_lon=fits.getval(couple_fn,'LON-DEG',0)*np.pi/180
