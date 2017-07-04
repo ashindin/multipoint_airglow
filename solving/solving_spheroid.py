@@ -276,6 +276,15 @@ def inv_problem_solve(couple_fn,model_fun,out_path):
     
     out_fn=(img1_data_obs+datetime.timedelta(seconds=img1_exptime/2)).strftime('%y%m%d_%H%M%S_%f_'+out_path.split('/')[1]+'.dat')
     
+    if  os.path.exists(out_path+out_fn):
+        fid=open(out_path+out_fn,'r')
+        fid.readline()
+        success_str=fid.readline()
+        status_str=fid.readline()
+        fid.close()
+        if success_str=="SUCCESS = True\n" or status_str=="STATUS = 0\n":
+            return 1
+    
     prev_mod_type='sphere'
     fn_previous='./'+prev_mod_type+'/'+(img1_data_obs+datetime.timedelta(seconds=img1_exptime/2)).strftime('%y%m%d_%H%M%S_%f_'+prev_mod_type+'.dat')
     fid=open(fn_previous,'r')
@@ -358,7 +367,7 @@ def inv_problem_solve(couple_fn,model_fun,out_path):
     mod_args= (args_prev[3], args_prev[4], args_prev[4])
     
     res = so.minimize(comparing_fun, normalize_args(mod_pos,mod_args), (model_fun,img1,img2,img1_ALT,img1_AZ,img2_ALT,img2_AZ,cam1_pos,cam2_pos),                       method='Nelder-Mead',options=
-                      {'return_all':True,'maxiter':1000, 'maxfev':1000,'xatol': 0.0001,'fatol': 0.0001})
+                      {'return_all':True,'maxiter':2000, 'maxfev':2000,'xatol': 0.0001,'fatol': 0.0001})
     
     if res.status==0 and res.success==True:
         fid=open(out_path+out_fn,'w')
