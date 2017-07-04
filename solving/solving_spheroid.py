@@ -133,8 +133,8 @@ def comparing_fun(b,model_fun,img1,img2,img1_ALT,img1_AZ,img2_ALT,img2_AZ,cam1_p
 #     m2=model_fun(a,r_keo,lat_keo,lon_keo,az_pix_keo,tet_pix_keo)
 #     ret=np.sum((im1-m1)**2)+np.sum((im2-m2)**2)
     #~ ret=0.12056327160493827*np.sum((img1-m1)**2)+(np.sum((img2-m2)**2))*0.25
-    ret1=0.12056327160493827*ne.sum(ne.evaluate("(img1-m1)**2"))
-    ret2=0.25*ne.sum(ne.evaluate("(img2-m2)**2"))
+    ret1=0.12056327160493827*ne.evaluate("sum((img1-m1)**2)")
+    ret2=0.25*ne.evaluate("sum((img2-m2)**2)")
     #~ return ret
     return ret1+ret2
 
