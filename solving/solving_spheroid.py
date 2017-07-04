@@ -132,8 +132,11 @@ def comparing_fun(b,model_fun,img1,img2,img1_ALT,img1_AZ,img2_ALT,img2_AZ,cam1_p
 #     m1=model_fun(a,r_s1c,lat_s1c,lon_s1c,az_pix_s1c,tet_pix_s1c)
 #     m2=model_fun(a,r_keo,lat_keo,lon_keo,az_pix_keo,tet_pix_keo)
 #     ret=np.sum((im1-m1)**2)+np.sum((im2-m2)**2)
-    ret=0.12056327160493827*np.sum((img1-m1)**2)+(np.sum((img2-m2)**2))*0.25
-    return ret
+    #~ ret=0.12056327160493827*np.sum((img1-m1)**2)+(np.sum((img2-m2)**2))*0.25
+    ret1=0.12056327160493827*ne.sum(ne.evaluate("(img1-m1)**2"))
+    ret2=0.25*ne.sum(ne.evaluate("(img2-m2)**2"))
+    #~ return ret
+    return ret1+ret2
 
 def represent_ans(x):
     return ' '.join(("{0:.3f}".format(x[0][0]*180/np.pi), "{0:.3f}".format(x[0][1]*180/np.pi), str(int(x[0][2])), str(int(x[1][0])), str(int(x[1][1]))))  
