@@ -285,7 +285,7 @@ def inv_problem_solve(couple_fn,model_fun,out_path):
         status_str=fid.readline()
         fid.close()
         if success_str=="SUCCESS = True\n" or status_str=="STATUS = 0\n":
-			print("Skip",couple_fn)
+            print("Skip",couple_fn)
             return 1
     
     prev_mod_type='spheroid'

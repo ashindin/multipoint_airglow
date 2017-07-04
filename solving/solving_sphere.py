@@ -285,7 +285,7 @@ def inv_problem_solve(couple_fn,model_fun,args0,out_path):
         status_str=fid.readline()
         fid.close()
         if success_str=="SUCCESS = True\n" or status_str=="STATUS = 0\n":
-			print("Skip",couple_fn)
+            print("Skip",couple_fn)
             return 1
     
     img1_lat=fits.getval(couple_fn,'LAT-DEG',0)*np.pi/180
