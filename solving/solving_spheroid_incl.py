@@ -294,6 +294,8 @@ def inv_problem_solve(couple_fn,model_fun,out_path):
     
     prev_mod_type='spheroid'
     fn_previous='./'+prev_mod_type+'/'+(img1_data_obs+datetime.timedelta(seconds=img1_exptime/2)).strftime('%y%m%d_%H%M%S_%f_'+prev_mod_type+'.dat')
+    if os.path.exists(fn_previous) == False:
+        return 1
     fid=open(fn_previous,'r')
     fid.readline()
     success_str=fid.readline()
@@ -470,6 +472,7 @@ def inv_problem_solve_spath(spath):
         #sys.stdout.flush()
 
         couple_fn=couples_fit_filenames[i]
+        print(couple_fn)
         inv_problem_solve(couple_fn,spheroid_incl_fun,'./spheroid_incl/')
     return None
 
