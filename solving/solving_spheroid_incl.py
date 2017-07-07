@@ -465,8 +465,8 @@ def inv_problem_solve_spath(spath):
             couples_fit_filenames.append(spath+fn)
     couples_fit_filenames=sorted(couples_fit_filenames)
     
-    #for i in range(len(couples_fit_filenames)):
-    for i in range(0,1):
+    for i in range(len(couples_fit_filenames)):
+    #for i in range(0,1):
         #sys.stdout.write('\r')
         #sys.stdout.write("Processing frame "+str(i+1)+"/"+str(len(couples_fit_filenames)))
         #sys.stdout.flush()
@@ -480,6 +480,6 @@ def inv_problem_solve_spath(spath):
 # In[ ]:
 
 inv_problem_solve_spath("../image_processing/couples140824/")
-#inv_problem_solve_spath("../image_processing/couples140826/")
-#inv_problem_solve_spath("../image_processing/couples160829/")
+inv_problem_solve_spath("../image_processing/couples140826/")
+inv_problem_solve_spath("../image_processing/couples160829/")
 
