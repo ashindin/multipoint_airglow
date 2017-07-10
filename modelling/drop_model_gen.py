@@ -92,6 +92,6 @@ fid.write('    H1=np.signbit(H1)\n')
 fid.write('    H2=np.signbit(H2)\n')
 
 #fid.write('    return NE*H1*H2\n')
-fid.write('    return H1*(~H2)*NE\n')
+fid.write('    return np.nan_to_num(H1*(~H2)*NE)\n')
 
 fid.close()
