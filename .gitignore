@@ -38,3 +38,5 @@ solving/spheroid
 solving/spheroid_incl
 solving/ellipsoid
 solving/drop
+figures/*.png
+figures/*.eps
