@@ -67,7 +67,7 @@ ax = plt.axes(projection=ccrs.PlateCarree())
 ax.set_extent((46, 49, 55.5, 56.5))
 
 
-ax.add_image(stamen_terrain, 11)
+ax.add_image(stamen_terrain, 10)
 
 
 plt.plot(46.0991056,56.1434444, marker='o', color='red', markersize=12,
