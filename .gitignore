@@ -40,3 +40,4 @@ solving/ellipsoid
 solving/drop
 figures/*.png
 figures/*.eps
+figures/*.pdf

@@ -58,7 +58,7 @@ stamen_terrain = StamenTerrain()
 
 # In[42]:
 
-fig=plt.figure(figsize=(12.7,4.5))
+fig=plt.figure(figsize=(6,3))
 # ax = plt.axes(projection=ccrs.Mollweide())
 ax = plt.axes(projection=ccrs.PlateCarree())
 # ax.coastlines(resolution='10m', zorder=2)
@@ -90,6 +90,9 @@ ax.gridlines(draw_labels=True)
 
 # scale_bar(ax, 100)
 
+plt.savefig('fig1.eps',dpi=300)
+plt.savefig('fig1.pdf',dpi=300)
 plt.savefig('fig1.png',dpi=300)
+
 # plt.show()
 
