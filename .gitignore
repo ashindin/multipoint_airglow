@@ -42,6 +42,7 @@ figures/*.png
 figures/*.eps
 figures/*.pdf
 paper/*.log
+paper/*.pdf
 paper/*.aux
 paper/*.bbl
 paper/*.blg
