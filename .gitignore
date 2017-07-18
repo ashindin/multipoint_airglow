@@ -47,3 +47,5 @@ paper/*.aux
 paper/*.bbl
 paper/*.blg
 paper/*.gz
+paper/*.sav
+paper/*.bak

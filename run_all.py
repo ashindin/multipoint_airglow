@@ -11,12 +11,13 @@ def main_script(python_cmd):
 python_cmd="python"
 
 try:
-    CP=subprocess.run([python_cmd, "--version"], check=True, stderr=subprocess.PIPE)
+    CP=subprocess.run([python_cmd, "--version"], check=True, stdout=subp
+rocess.PIPE, stderr=subprocess.PIPE)
 except FileNotFoundError:
     python_cmd="python3"
-    CP=subprocess.run([python_cmd, "--version"], check=True, stderr=subprocess.PIPE)
-
-python_version_str=str(CP.stderr)[9:14]
+    CP=subprocess.run([python_cmd, "--version"], check=True, stdout=subp
+rocess.PIPE, stderr=subprocess.PIPE)
+                                                                        python_version_str=str(CP.stdout + CP.stderr)[9:14]
 
 main_v=int(python_version_str.split('.')[0])
 major_v=int(python_version_str.split('.')[1])
