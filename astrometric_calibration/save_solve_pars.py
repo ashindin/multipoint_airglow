@@ -96,7 +96,7 @@ def save_keo_manual_solve_pars(stars_fname,save_fname,lat_deg=55.9305361,lon_deg
     
     AZ=np.zeros(table.shape[0])
     ALT=np.zeros(table.shape[0])
-    
+    print("WOW")
     for i in range(table.shape[0]):
         sao_name="SAO " + str(int(table[i,2]))
         sc=SkyCoord.from_name(sao_name)
@@ -108,7 +108,7 @@ def save_keo_manual_solve_pars(stars_fname,save_fname,lat_deg=55.9305361,lon_deg
 #     print(np.vstack((table[:,2].T,X,Y,AZ*180/np.pi,ALT*180/np.pi)).T)
     
     res=so.minimize(arc_module.arc_calc_pix2st_coefs_discrep,(0,np.pi/2),(AZ,ALT,X,Y),method='Nelder-Mead')
-
+    res_fun=res.fun
     res_x=res.x
     if res_x[1]>np.pi/2:
         res_x[1]=np.pi-res_x[1]
@@ -125,8 +125,8 @@ def save_keo_manual_solve_pars(stars_fname,save_fname,lat_deg=55.9305361,lon_deg
     #print("sigma = ", arc_module.arc_calc_pix2st_coefs_discrep((az0,alt0),AZ,ALT,X,Y))
     
     fid=open(save_fname,'w')
-    fid.write("# az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
-    str_to_file=str(az0_med)+ " " +str(alt0_med)
+    fid.write("# error_pix az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
+    str_to_file=str(res_fun) + " " + str(az0_med)+ " " +str(alt0_med)
     str_to_file+=" " + str(a_med[0]) + " " + str(a_med[1]) + " " + str(a_med[2])
     str_to_file+=" " + str(b_med[0]) + " " + str(b_med[1]) + " " + str(b_med[2])
     str_to_file+=" " + str(c_med[0]) + " " + str(c_med[1]) + " " + str(c_med[2])

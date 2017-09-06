@@ -131,7 +131,7 @@ def sbig_solve_field_altaz(fname, solve_pars, get_date_obs_fun=sbig_get_date_obs
     ALT=AA.alt.rad
 
     res=so.minimize(tan_calc_pix2st_coefs_discrep,(0,np.pi/2),(AZ,ALT,X,Y),method='Nelder-Mead')
-
+    res_fun=res.fun
     res_x=res.x
     if res_x[1]>np.pi/2:
         res_x[1]=np.pi-res_x[1]
@@ -148,12 +148,12 @@ def sbig_solve_field_altaz(fname, solve_pars, get_date_obs_fun=sbig_get_date_obs
 #     print(az0*180/np.pi,alt0*180/np.pi)
     az_c, alt_c = tan_pix2hor(144,144,az0,alt0,a,b)
     print("Central pixel direction (AZ, ALT in deg):",az_c*180/np.pi,alt_c*180/np.pi)       
-    return az0,alt0,az_c,alt_c,a,b,c,d
+    return az0,alt0,az_c,alt_c,a,b,c,d,res_fun
 
 def save_solve_data(fit_path,solve_fname):
     fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
     res_fid=open(solve_fname,'w')
-    res_fid.write("# filename.fit az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
+    res_fid.write("# filename.fit error_pix az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
     for i in range(len(fit_filenames)):
         ret = sbig_solve_field_altaz(fit_filenames[i],sbig_solve_pars)
         if type(ret)!=int:
@@ -165,7 +165,8 @@ def save_solve_data(fit_path,solve_fname):
             b=ret[5]
             c=ret[6]
             d=ret[7]
-            str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
+            fun=ret[8]
+            str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(fun) + " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
             str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
             str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
             str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
