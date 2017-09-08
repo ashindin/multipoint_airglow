@@ -49,3 +49,6 @@ paper/*.blg
 paper/*.gz
 paper/*.sav
 paper/*.bak
+comparing/__pycache__/
+comparing/*.png
+solving/nice

@@ -73,7 +73,7 @@ ax.add_image(stamen_terrain, 10)
 plt.plot(46.0991056,56.1434444, marker='o', color='red', markersize=12,
          alpha=0.7)#, transform=ccrs.Geodetic())
 
-plt.text(46.0991056,56.19, u'SURA / S1C',
+plt.text(46.0991056,56.19, u'"Сура" / А',
          verticalalignment='bottom', horizontalalignment='left',
          #transform=text_transform,
          bbox=dict(facecolor='sandybrown', alpha=0.5, boxstyle='round'))
@@ -81,7 +81,7 @@ plt.text(46.0991056,56.19, u'SURA / S1C',
 plt.plot(48.7444861,55.9305361, marker='o', color='red', markersize=12,
          alpha=0.7)#, transform=ccrs.Geodetic())
 
-plt.text(48.7444861,55.9305361+0.05, u'KEO',
+plt.text(48.7444861,55.9305361+0.05, u'Б',
          verticalalignment='bottom', horizontalalignment='left',
          #transform=text_transform,
          bbox=dict(facecolor='sandybrown', alpha=0.5, boxstyle='round'))
