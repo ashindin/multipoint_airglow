@@ -72,7 +72,7 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
 
     if os_name=='Windows':
         fname="/cygdrive/"+fname.replace(":","").replace("\\","/")
-#     print(fname)
+    #~ print(fname)
     path, file = os.path.split(fname)
     spath=path+"/.temp"
 #     print(spath)
@@ -82,10 +82,11 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     if err_code!=0:
         return 1
 
-    com_line='cd ' + spath  + ' && ' + solve_field_path + ' ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
+    #~ com_line='cd ' + spath  + ' && ' + solve_field_path + ' ' + axy_fname.split('/')[-1] +' --continue -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -S none -B none -W none'
+    com_line='cd ' + spath  + ' && ' + solve_field_path + ' ' + fname +' --overwrite -D ' + spath + ' ' + solve_pars + ' --cpulimit 2 --no-plots -M none -N none -S none -B none -W none'
     if os_name=='Windows':
         com_line=win_com_prefix+com_line+win_com_postfix
-    #print(com_line)
+    #~ print(com_line)
     err_code=os.system(com_line)
     if err_code!=0:
         return 2
@@ -139,7 +140,8 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
     ALT=AA.alt.rad
 
     res=so.minimize(tan_calc_pix2st_coefs_discrep,(0,np.pi/2),(AZ,ALT,X,Y),method='Nelder-Mead')
-
+    res_fun=res.fun
+    
     res_x=res.x
     if res_x[1]>np.pi/2:
         res_x[1]=np.pi-res_x[1]
@@ -156,33 +158,35 @@ def s1c_solve_field_altaz(fname, solve_pars, get_date_obs_fun=s1c_get_date_obs,l
 #     print(az0*180/np.pi,alt0*180/np.pi)
     az_c, alt_c = tan_pix2hor(144,144,az0,alt0,a,b)
     print("Central pixel direction (AZ, ALT in deg):",az_c*180/np.pi,alt_c*180/np.pi)
-    return az0,alt0,az_c,alt_c,a,b,c,d
+    return az0,alt0,az_c,alt_c,a,b,c,d,res_fun
 
 def save_solve_data(fit_path,solve_fname):
-	fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
-	res_fid=open(solve_fname,'w')
-	res_fid.write("# filename.fit az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
-	for i in range(len(fit_filenames)):
-		ret = s1c_solve_field_altaz(fit_filenames[i],s1c_solve_pars)
-		if type(ret)!=int:
-			az0=ret[0]
-			alt0=ret[1]
-			az_c=ret[2]
-			alt_c=ret[3]
-			a=ret[4]
-			b=ret[5]
-			c=ret[6]
-			d=ret[7]
-			str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
-			str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
-			str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
-			str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
-			str_to_file+=" " + str(d[0]) + " " + str(d[1]) + " " + str(d[2]) + "\n"
-			res_fid.write(str_to_file)
-		else:
-			print(ret)
-			print(str(i)," ",fit_filenames[i].split("/")[-1]," ERROR")
-	res_fid.close()
+    fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
+    res_fid=open(solve_fname,'w')
+    res_fid.write("# filename.fit error_pix az_c alt_c az0 alt0 a[0] a[1] a[2] b[0] b[1] b[2] c[0] c[1] c[2] d[0] d[1] d[2]\n")
+    for i in range(len(fit_filenames)):
+        ret = s1c_solve_field_altaz(fit_filenames[i],s1c_solve_pars)
+        if type(ret)!=int:
+            az0=ret[0]
+            alt0=ret[1]
+            az_c=ret[2]
+            alt_c=ret[3]
+            a=ret[4]
+            b=ret[5]
+            c=ret[6]
+            d=ret[7]
+            fun=ret[8]
+            
+            str_to_file=fit_filenames[i].split("/")[-1]+ " " + str(fun) + " " + str(az_c) + " " +str(alt_c)+ " " +str(az0)+ " " +str(alt0)
+            str_to_file+=" " + str(a[0]) + " " + str(a[1]) + " " + str(a[2])
+            str_to_file+=" " + str(b[0]) + " " + str(b[1]) + " " + str(b[2])
+            str_to_file+=" " + str(c[0]) + " " + str(c[1]) + " " + str(c[2])
+            str_to_file+=" " + str(d[0]) + " " + str(d[1]) + " " + str(d[2]) + "\n"
+            res_fid.write(str_to_file)
+        else:
+            print(ret)
+            print(str(i)," ",fit_filenames[i].split("/")[-1]," ERROR")
+    res_fid.close()
 
 fit_path="../data/140824/s1c"
 solve_fname="solve_field_altaz_140824_s1c.dat"
