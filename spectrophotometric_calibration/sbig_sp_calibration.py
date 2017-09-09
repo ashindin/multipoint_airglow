@@ -42,9 +42,9 @@ def get_solve_pars(save_fname):
     lines=fid.readlines()
     pars_list=lines[1].split(' ')
     pars=[float(par_str) for par_str in pars_list]
-    az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
+    err, az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
     fid.close()
-    return az0,alt0,a,b,c,d
+    return err, az0,alt0,a,b,c,d
 def make_movie_from_pngs(png_prefix, num_frames, movie_fname):
     com_line="ffmpeg -y -r 5 -f image2 -s 1280x720 -i " + png_prefix + "%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " +"-vframes "+ str(num_frames) +" "+ movie_fname
 #     print(com_line)
@@ -80,7 +80,7 @@ def sbig_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fn
     masterflat=hdulist[0].data
     hdulist.close()
 
-    az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
+    err, az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
     M_sbig = get_scale_and_orientation_info(c,d)
 #     print(M_sbig)
     spath="./.temp/"
@@ -89,6 +89,8 @@ def sbig_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fn
     fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
 
     R_median=np.zeros(len(fit_filenames))
+    R_std=np.zeros(len(fit_filenames))
+    
     fig=plt.figure(figsize=(12.8,7.2))
     fig.set_size_inches(12.8, 7.2)
 
@@ -302,6 +304,8 @@ def sbig_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fn
         # print(len(R),R)
         if len(R)>0:
             R_median[i]=np.median(R)
+            temp=(R-R_median[i])**2
+            R_std[i]=np.sqrt(np.median(temp))
         #     print(R_median[i])
 
         plt.sca(ax1)
@@ -354,7 +358,7 @@ def sbig_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fn
         ax4.clear()
         ax5.clear()
 
-        fid.write(fit_fname.split('/')[-1] + " " + str(R_median[i]) + "\n")
+        fid.write(fit_fname.split('/')[-1] + " " + str(R_median[i])+ " " + str(R_std[i]) + "\n")
 
     plt.close()
     sys.stdout.write('\n')

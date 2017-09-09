@@ -51,9 +51,9 @@ def get_solve_pars(save_fname):
     lines=fid.readlines()
     pars_list=lines[1].split(' ')
     pars=[float(par_str) for par_str in pars_list]
-    az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
+    err,az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
     fid.close()
-    return az0,alt0,a,b,c,d
+    return err,az0,alt0,a,b,c,d
 def make_movie_from_pngs(png_prefix, num_frames, movie_fname):
     com_line="ffmpeg -y -r 5 -f image2 -s 1280x720 -i " + png_prefix + "%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " +"-vframes "+ str(num_frames) +" "+ movie_fname
 #     print(com_line)
@@ -89,7 +89,7 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
     masterflat=hdulist[0].data
     hdulist.close()
 
-    az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
+    err,az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
     M_s1c = get_scale_and_orientation_info(c,d)
 
     spath="./.temp/"
@@ -98,6 +98,8 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
     fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
 
     R_median=np.zeros(len(fit_filenames))
+    R_std=np.zeros(len(fit_filenames))
+
     fig=plt.figure(figsize=(12.8,7.2))
     fig.set_size_inches(12.8, 7.2)
 
@@ -312,6 +314,8 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
         # print(len(R),R)
         if len(R)>0:
             R_median[i]=np.median(R)
+            temp=(R-R_median[i])**2
+            R_std[i]=np.sqrt(np.median(temp))
         #     print(R_median[i])
 
         plt.sca(ax1)
@@ -364,14 +368,14 @@ def s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fna
         ax4.clear()
         ax5.clear()
 
-        fid.write(fit_fname.split('/')[-1] + " " + str(R_median[i]) + "\n")
+        fid.write(fit_fname.split('/')[-1] + " " + str(R_median[i])+ " " + str(R_std[i]) + "\n")
 
     plt.close()
     sys.stdout.write('\n')
     sys.stdout.flush()
     fid.close()
 
-    return png_prefix, len(fit_filenames), R_median
+    return png_prefix, len(fit_filenames), R_median, R_std
 
 
 # In[12]:
@@ -382,15 +386,15 @@ solve_pars_fname="../astrometric_calibration/s1c_140824_solve.pars"
 masterdark_fname="s1c_140824_masterdark.fit"
 masterflat_fname="s1c_master.flat"
 save_fname="s1c_140824_day.spcal"
-png_prefix, num_frames, R_median = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
+png_prefix, num_frames, R_median, R_std = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
-R_std=np.std(R_filt)
-print(R_day, R_std)
+R_std2=np.std(R_filt)
+print(R_day, R_std2)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] its std for 14/08/24:\n")
-fid.write(str(R_day)+" "+str(R_std))
+fid.write(str(R_day)+" "+str(R_std2))
 fid.close()
 
 
@@ -402,15 +406,15 @@ solve_pars_fname="../astrometric_calibration/s1c_140826_solve.pars"
 masterdark_fname="s1c_140826_masterdark.fit"
 masterflat_fname="s1c_master.flat"
 save_fname="s1c_140826_day.spcal"
-png_prefix, num_frames, R_median = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
+png_prefix, num_frames, R_median, R_std = s1c_sp_calibration(fit_path,masterdark_fname,masterflat_fname,solve_pars_fname,area_rad=4,med_size=21)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[500::]
 R_filt=R_median[np.where(R_median>0)]
 R_day=np.median(R_filt)
-R_std=np.std(R_filt)
-print(R_day, R_std)
+R_std2=np.std(R_filt)
+print(R_day, R_std2)
 fid=open(save_fname,'w')
 fid.write("# Median camera calibration coefficient [Rayleighs per ADC unit] and its std for 14/08/26:\n")
-fid.write(str(R_day)+" "+str(R_std))
+fid.write(str(R_day)+" "+str(R_std2))
 fid.close()
 

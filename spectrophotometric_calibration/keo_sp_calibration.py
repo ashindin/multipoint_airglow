@@ -42,9 +42,9 @@ def get_solve_pars(save_fname):
     lines=fid.readlines()
     pars_list=lines[1].split(' ')
     pars=[float(par_str) for par_str in pars_list]
-    az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
+    err, az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
     fid.close()
-    return az0,alt0,a,b,c,d
+    return err, az0,alt0,a,b,c,d
 def make_movie_from_pngs(png_prefix, num_frames, movie_fname):
     com_line="ffmpeg -y -r 5 -f image2 -s 1280x720 -i " + png_prefix + "%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " +"-vframes "+ str(num_frames) +" "+ movie_fname
 #     print(com_line)
@@ -76,7 +76,7 @@ def keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname=Non
     masterdark=hdulist[0].data
     hdulist.close()
 
-    az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
+    err, az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
     M_s1c = get_scale_and_orientation_info(c,d)
 
     spath="./.temp/"
@@ -85,6 +85,8 @@ def keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname=Non
     fit_filenames=[fit_path+'/'+fn for fn in next(os.walk(fit_path))[2]]
 
     R_median=np.zeros(len(fit_filenames))
+    R_std=np.zeros(len(fit_filenames))
+    
     fig=plt.figure(figsize=(12.8,7.2))
     fig.set_size_inches(12.8, 7.2)
 
@@ -302,6 +304,8 @@ def keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname=Non
         # print(len(R),R)
         if len(R)>0:
             R_median[i]=np.median(R)
+            temp=(R-R_median[i])**2
+            R_std[i]=np.sqrt(np.median(temp))
         #     print(R_median[i])
 
         plt.sca(ax1)
@@ -354,7 +358,7 @@ def keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname=Non
         ax4.clear()
         ax5.clear()
 
-        fid.write(fit_fname.split('/')[-1] + " " + str(R_median[i]) + "\n")
+        fid.write(fit_fname.split('/')[-1] + " " + str(R_median[i])+ " " + str(R_std[i]) + "\n")
 
     plt.close()
     sys.stdout.write('\n')
@@ -365,10 +369,10 @@ def keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname=Non
 
 fit_path="../data/140824/keo"
 movie_fname="keo_140824_calibration.mp4"
-solve_pars_fname="../astrometric_calibration/keo_140824_solve.pars"
+solve_pars_fname="../astrometric_calibration/keo_140824_solve_manual.pars"
 masterdark_fname="keo_140824_masterdark.fit"
 save_fname="keo_140824_day.spcal"
-png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,area_rad=3,med_size=15)
+png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname="keo_140824.spcal",area_rad=3,med_size=15)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[50:350]
 R_filt=R_median[np.where(R_median>0)]
@@ -385,10 +389,10 @@ fid.close()
 
 fit_path="../data/140826/keo"
 movie_fname="keo_140826_calibration.mp4"
-solve_pars_fname="../astrometric_calibration/keo_140826_solve.pars"
+solve_pars_fname="../astrometric_calibration/keo_140826_solve_manual.pars"
 masterdark_fname="keo_140826_masterdark.fit"
 save_fname="keo_140826_day.spcal"
-png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,area_rad=3,med_size=15)
+png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname="keo_140826.spcal",area_rad=3,med_size=15)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[200:400]
 R_filt=R_median[np.where(R_median>0)]
@@ -405,10 +409,10 @@ fid.close()
 
 fit_path="../data/160829/keo"
 movie_fname="keo_160829_calibration.mp4"
-solve_pars_fname="../astrometric_calibration/keo_160829_solve.pars"
+solve_pars_fname="../astrometric_calibration/keo_160829_solve_manual.pars"
 masterdark_fname="keo_160829_masterdark.fit"
 save_fname="keo_160829_day.spcal"
-png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,area_rad=3,med_size=15)
+png_prefix, num_frames, R_median = keo_sp_calibration(fit_path,masterdark_fname,solve_pars_fname,save_fname="keo_160829.spcal",area_rad=3,med_size=15)
 make_movie_from_pngs(png_prefix, num_frames, movie_fname)
 R_median=R_median[100:400]
 R_filt=R_median[np.where(R_median>0)]
