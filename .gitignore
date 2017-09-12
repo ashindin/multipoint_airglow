@@ -21,6 +21,7 @@ spectrophotometric_calibration/*.mp4
 spectrophotometric_calibration/*.spcal
 image_processing/*.png
 image_processing/*.frames
+image_processing/*.bak
 image_processing/s1c140824_glowfit
 image_processing/s1c140826_glowfit
 image_processing/keo140824_glowfit

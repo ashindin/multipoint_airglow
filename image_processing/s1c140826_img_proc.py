@@ -8,6 +8,7 @@ import os, sys, inspect
 import numpy as np
 from astropy.io import fits
 import scipy.signal as ss
+import scipy.interpolate as si
 
 cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../astrometric_calibration")))
 if cmd_subfolder not in sys.path:
@@ -73,9 +74,9 @@ def get_solve_pars(save_fname):
     lines=fid.readlines()
     pars_list=lines[1].split(' ')
     pars=[float(par_str) for par_str in pars_list]
-    az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
+    err, az0,alt0,a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2],d[0],d[1],d[2]=pars
     fid.close()
-    return az0,alt0,a,b,c,d
+    return err, az0,alt0,a,b,c,d
 
 def get_spcal_day_coefs(spcal_day_fname):
     fid = open(spcal_day_fname,'r')
@@ -142,22 +143,22 @@ def shift_img(img_base, base_time, obs_time):
     XPIX2, YPIX2=tan_hor2pix(ALTAZ_new.az.rad,ALTAZ_new.alt.rad,az0,alt0,c,d)
 
     med_value=np.median(img_base)
-    img_mod=np.zeros_like(img_base)
-    for i in range(np.size(img_base)):
-        x=XPIX2.flat[i]-np.trunc(XPIX2.flat[i]);
-        y=YPIX2.flat[i]-np.trunc(YPIX2.flat[i]);
-        x0=int(np.trunc(XPIX2.flat[i]));
-        y0=int(np.trunc(YPIX2.flat[i]));
-        if (x0>=1) and (y0>=1) and (x0<img_base.shape[1]) and (y0<img_base.shape[0]):
-            img_mod[y0,x0]=img_mod[y0,x0]+(1-x)*(1-y)*img_base.flat[i];
-        if (x0+1>=1) and (y0>=1) and (x0+1<img_base.shape[1]) and (y0<img_base.shape[0]):
-            img_mod[y0,x0+1]=img_mod[y0,x0+1]+(x)*(1-y)*img_base.flat[i];
-        if (x0>=1) and (y0+1>=1) and (x0<img_base.shape[1]) and (y0+1<img_base.shape[0]):
-            img_mod[y0+1,x0]=img_mod[y0+1,x0]+(1-x)*(y)*img_base.flat[i];
-        if (x0+1>=1) and (y0+1>=1) and (x0+1<img_base.shape[1]) and (y0+1<img_base.shape[0]):
-            img_mod[y0+1,x0+1]=img_mod[y0+1,x0+1]+(x)*(y)*img_base.flat[i];
-    img_mod.flat[np.where(img_mod.flat == 0.)[0]]=med_value
-#     img_mod = si.griddata((YPIX2.flat,XPIX2.flat), img_base.flat, (XPIX, YPIX), fill_value=med_value, method='linear')
+    #~ img_mod=np.zeros_like(img_base)
+    #~ for i in range(np.size(img_base)):
+        #~ x=XPIX2.flat[i]-np.trunc(XPIX2.flat[i]);
+        #~ y=YPIX2.flat[i]-np.trunc(YPIX2.flat[i]);
+        #~ x0=int(np.trunc(XPIX2.flat[i]));
+        #~ y0=int(np.trunc(YPIX2.flat[i]));
+        #~ if (x0>=1) and (y0>=1) and (x0<img_base.shape[1]) and (y0<img_base.shape[0]):
+            #~ img_mod[y0,x0]=img_mod[y0,x0]+(1-x)*(1-y)*img_base.flat[i];
+        #~ if (x0+1>=1) and (y0>=1) and (x0+1<img_base.shape[1]) and (y0<img_base.shape[0]):
+            #~ img_mod[y0,x0+1]=img_mod[y0,x0+1]+(x)*(1-y)*img_base.flat[i];
+        #~ if (x0>=1) and (y0+1>=1) and (x0<img_base.shape[1]) and (y0+1<img_base.shape[0]):
+            #~ img_mod[y0+1,x0]=img_mod[y0+1,x0]+(1-x)*(y)*img_base.flat[i];
+        #~ if (x0+1>=1) and (y0+1>=1) and (x0+1<img_base.shape[1]) and (y0+1<img_base.shape[0]):
+            #~ img_mod[y0+1,x0+1]=img_mod[y0+1,x0+1]+(x)*(y)*img_base.flat[i];
+    #~ img_mod.flat[np.where(img_mod.flat == 0.)[0]]=med_value
+    img_mod = si.griddata((YPIX2.flat,XPIX2.flat), img_base.flat, (YPIX, XPIX), fill_value=med_value, method='linear')
     return img_mod;
 
 
@@ -174,9 +175,9 @@ lat_cam_deg=56.1501667; lat_cam=lat_cam_deg*np.pi/180;
 lon_cam_deg=46.1050833; lon_cam=lon_cam_deg*np.pi/180;
 hei_cam=183.;
 CAM_site=EarthLocation(lat=lat_cam_deg*u.deg, lon=lon_cam_deg*u.deg, height=hei_cam*u.m)
-avr_width1=11
+avr_width1=15
 avr_width2=31
-interp_deg=2 # three points
+interp_deg=1 # three points
 
 
 # In[7]:
@@ -271,7 +272,7 @@ YPIX, XPIX = np.mgrid[1:BF_imgs[0].shape[0]+1, 1:BF_imgs[0].shape[1]+1]
 
 # In[15]:
 
-az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
+err,az0,alt0,a,b,c,d=get_solve_pars(solve_pars_fname)
 
 
 # In[ ]:
@@ -340,12 +341,21 @@ for i in range(bf_inds[0],bf_inds[-1]):
             sp_offset=abs(s1c_spcal_day_coef-sp_coef)/s1c_spcal_std
 
     y=[]
+    y_date=[]
     for j in range(len(bfl_locals)):
         y.append(shift_img(BF_imgs[bfl_locals[j]],bfd_locals[j],f_date))
+        y_date.append(bfd_locals[j])
 
-    det=bfdx_locals[0]**2*bfdx_locals[1]+bfdx_locals[2]**2*bfdx_locals[0]+bfdx_locals[1]**2*bfdx_locals[2]-bfdx_locals[2]**2*bfdx_locals[1]-bfdx_locals[1]**2*bfdx_locals[0]-bfdx_locals[0]**2*bfdx_locals[2]
-    dark=(bfdx_locals[0]**2*bfdx_locals[1]*y[2]+bfdx_locals[2]**2*bfdx_locals[0]*y[1]+bfdx_locals[1]**2*bfdx_locals[2]*y[0]
-        -bfdx_locals[2]**2*bfdx_locals[1]*y[0]-bfdx_locals[1]**2*bfdx_locals[0]*y[2]-bfdx_locals[0]**2*bfdx_locals[2]*y[1])/det
+
+    date_range=dates.date2num(y_date[1])-dates.date2num(y_date[0])
+    dfraq2=(dates.date2num(f_date)-dates.date2num(y_date[0]))/date_range
+    dfraq1=1-dfraq2
+    #~ print(dfraq1,dfraq2)
+    
+#     det=bfdx_locals[0]**2*bfdx_locals[1]+bfdx_locals[2]**2*bfdx_locals[0]+bfdx_locals[1]**2*bfdx_locals[2]-bfdx_locals[2]**2*bfdx_locals[1]-bfdx_locals[1]**2*bfdx_locals[0]-bfdx_locals[0]**2*bfdx_locals[2]
+#     dark=(bfdx_locals[0]**2*bfdx_locals[1]*y[2]+bfdx_locals[2]**2*bfdx_locals[0]*y[1]+bfdx_locals[1]**2*bfdx_locals[2]*y[0]
+#         -bfdx_locals[2]**2*bfdx_locals[1]*y[0]-bfdx_locals[1]**2*bfdx_locals[0]*y[2]-bfdx_locals[0]**2*bfdx_locals[2]*y[1])/det
+    dark=dfraq1*y[0]+dfraq2*y[1]
 
     f_date_iso=f_date_start.strftime('%Y-%m-%dT%H:%M:%S.%f')
 
@@ -366,7 +376,8 @@ for i in range(bf_inds[0],bf_inds[-1]):
 
     hdulist = fits.open(fn,ignore_missing_end=True)
     img=hdulist[0].data.astype('float')
-    img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * s1c_spcal_day_coef
+    #~ img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * s1c_spcal_day_coef
+    img=ss.medfilt((img-masterdark.astype('float'))/masterflat.astype('float') - dark,kernel_size=avr_width2) * 2.20
 
     hdu_light = fits.PrimaryHDU(img)
     hdu_light.header['DATE-OBS']=f_date_iso
