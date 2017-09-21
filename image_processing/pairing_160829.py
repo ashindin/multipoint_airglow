@@ -106,6 +106,8 @@ for fn in next(os.walk(keo_fit_path))[2]:
         keo_fit_filenames.append(fn)
         keo_fit_fullnames.append(keo_fit_path + '/' + fn)
 keo_fit_filenames=sorted(keo_fit_filenames)
+keo_fit_fullnames=sorted(keo_fit_fullnames)
+
 # sorted([keo_fit_path+'/'+fn for fn in next(os.walk(keo_fit_path))[2]])
 sbig_fit_path="./sbig160829_glowfit"
 sbig_fit_filenames=[]
@@ -115,7 +117,7 @@ for fn in next(os.walk(sbig_fit_path))[2]:
         sbig_fit_filenames.append(fn)
         sbig_fit_fullnames.append(sbig_fit_path + '/' + fn)
 sbig_fit_filenames=sorted(sbig_fit_filenames)
-
+sbig_fit_fullnames=sorted(sbig_fit_fullnames)
 
 # In[5]:
 

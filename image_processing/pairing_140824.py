@@ -141,6 +141,7 @@ for fn in next(os.walk(keo_fit_path))[2]:
         keo_fit_filenames.append(fn)
         keo_fit_fullnames.append(keo_fit_path + '/' + fn)
 keo_fit_filenames=sorted(keo_fit_filenames)
+keo_fit_fullnames=sorted(keo_fit_fullnames)
 
 s1c_fit_path="./s1c140824_glowfit"
 s1c_fit_filenames=[]
@@ -150,7 +151,7 @@ for fn in next(os.walk(s1c_fit_path))[2]:
         s1c_fit_filenames.append(fn)
         s1c_fit_fullnames.append(s1c_fit_path + '/' + fn)
 s1c_fit_filenames=sorted(s1c_fit_filenames)
-
+s1c_fit_fullnames=sorted(s1c_fit_fullnames)
 
 # In[5]:
 
@@ -214,7 +215,7 @@ couples_fit_filenames=sorted(couples_fit_filenames)
 # In[45]:
 
 # plotting
-vmin=-15
+vmin=0
 vmax=15
 for i in range(len(couples_fit_filenames)):
 #for i in range(194,195):

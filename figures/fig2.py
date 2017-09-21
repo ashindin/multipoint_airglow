@@ -257,14 +257,15 @@ def figure2(fit_fn1,fit_fn2,save_fname1,save_fname2, xx_list_sbig, yy_list_sbig,
     img=(img-masterdark)/masterflat
 
     vrange=1.5*np.std(img)
-    plt.pcolormesh(img, cmap="gray", vmin=np.median(img)-vrange+vshift, vmax=np.median(img)+vrange+vshift)
+    pcm1=plt.pcolormesh(img, cmap="gray", vmin=np.median(img)-vrange+vshift, vmax=np.median(img)+vrange+vshift)
+    pcm1.set_edgecolor('face')
     plt.axis('equal')
     ax1.set_xlim((0,372))
     ax1.set_ylim((281,0)) 
     for m in [19,20,47]:
         x_list=xx_list_sbig[m]
         y_list=yy_list_sbig[m]
-        plt.plot(x_list,y_list,'b',lw=0.7)
+        plt.plot(x_list,y_list,'y',lw=1.5)
 
     az_axe=np.linspace(0,2*np.pi,100)
     for alt_deg in range(80,92,2):            
@@ -291,14 +292,15 @@ def figure2(fit_fn1,fit_fn2,save_fname1,save_fname2, xx_list_sbig, yy_list_sbig,
     masterdark=fits.getdata(md_fname).astype('float')        
     img=(img-masterdark)
     vrange=1.5*np.std(img)
-    plt.pcolormesh(img, cmap="gray", vmin=np.median(img)-vrange+vshift, vmax=np.median(img)+vrange+vshift)
+    pcm2=plt.pcolormesh(img, cmap="gray", vmin=np.median(img)-vrange+vshift, vmax=np.median(img)+vrange+vshift)
+    pcm2.set_edgecolor('face')
     plt.axis('equal')
 
 #         for m in [19,20,47]:
     for m in range(len(xx_list_keo)):
         x_list=xx_list_keo[m]
         y_list=yy_list_keo[m]
-        plt.plot(x_list,y_list,'b',lw=0.7)
+        plt.plot(x_list,y_list,'y',lw=0.7)
 
     az_axe=np.linspace(0,2*np.pi,100)
     for alt_deg in range(0,90,10):            

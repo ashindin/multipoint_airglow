@@ -2,7 +2,7 @@ from sympy import *
 
 # init_printing()
 
-fun_str='a1*exp(-(x/a2)**2 - (y/a3)**2)/a4/beta(a5,a6)*((z)/a4)**(a5-1)*((a4-(z))/a4)**(a6-1)'
+fun_str='a1*exp(-(x/a2)**2 - (y/a3)**2)*((z)/a4)**(a5-1)*((a4-(z))/a4)**(a6-1)'
 model_fun_fname='model_drop_fun.py'
 
 fun=sympify(fun_str)
@@ -60,7 +60,7 @@ funREA_str=str(funREA).replace('beta(a5, a6)','beta_a5a6')
 fid=open(model_fun_fname,'w')
 fid.write('import numpy as np\n')
 fid.write('import numexpr as ne\n')
-fid.write('import scipy.special as sp\n')
+#~ fid.write('import scipy.special as sp\n')
 fid.write('def drop_fun(R,E,A,aa,mod_pos,cam_pos):\n')
 fid.write('    a1=aa[0]\n    a2=aa[1]\n    a3=aa[2]\n    a4=aa[3]\n')
 
@@ -77,8 +77,8 @@ fid.write('    else:\n')
 fid.write('        a5=6.\n')
 fid.write('        a6=6.-(aa[4]*8-4.)\n')
 
-fid.write('    beta_a5a6=sp.beta(a5,a6)\n')
-fid.write('    norm_coef=((a5 - 1)/(a5 + a6 - 2))**a5*((a6 - 1)/(a5 + a6 - 2))**a6*(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4)/(a4*(a5*a6 - a5 - a6 + 1)*sp.beta(a5, a6))\n')
+#~ fid.write('    beta_a5a6=sp.beta(a5,a6)\n')
+fid.write('    norm_coef=((a5 - 1)/(a5 + a6 - 2))**a5*((a6 - 1)/(a5 + a6 - 2))**a6*(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4)/((a5*a6 - a5 - a6 + 1))\n')
 fid.write('    norm_coef=1/norm_coef\n')
 fid.write('    phi_m=mod_pos[0]\n    lam_m=mod_pos[1]\n    h_m=mod_pos[2]\n')
 fid.write('    phi_k=cam_pos[0]\n    lam_k=cam_pos[1]\n    h_k=cam_pos[2]\n')

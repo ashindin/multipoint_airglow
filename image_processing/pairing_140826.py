@@ -26,7 +26,10 @@ from matplotlib import dates
 def get_fit_pars(fname):
 #     print(fname)
     fid_fit=fits.open(fname);
-    date_obs=datetime.datetime.strptime(fid_fit[0].header["DATE-OBS"],"%Y-%m-%dT%H:%M:%S.%f")
+    try:
+        date_obs=datetime.datetime.strptime(fid_fit[0].header["DATE-OBS"],"%Y-%m-%dT%H:%M:%S.%f")
+    except:
+        date_obs=datetime.datetime.strptime(fid_fit[0].header["DATE-OBS"],"%Y-%m-%dT%H:%M:%S")
 #     print(date_obs)
     exp_sec=fid_fit[0].header["EXPTIME"]
     sp_offset=fid_fit[0].header["SPCAL-O"]
@@ -142,6 +145,7 @@ for fn in next(os.walk(keo_fit_path))[2]:
         keo_fit_filenames.append(fn)
         keo_fit_fullnames.append(keo_fit_path + '/' + fn)
 keo_fit_filenames=sorted(keo_fit_filenames)
+keo_fit_fullnames=sorted(keo_fit_fullnames)
 
 s1c_fit_path="./s1c140826_glowfit"
 s1c_fit_filenames=[]
@@ -151,7 +155,7 @@ for fn in next(os.walk(s1c_fit_path))[2]:
         s1c_fit_filenames.append(fn)
         s1c_fit_fullnames.append(s1c_fit_path + '/' + fn)
 s1c_fit_filenames=sorted(s1c_fit_filenames)
-
+s1c_fit_fullnames=sorted(s1c_fit_fullnames)
 
 # In[5]:
 
@@ -184,6 +188,7 @@ s1c_x_date=np.array(s1c_x_date)
 c_i=0
 for i in range(len(keo_fit_filenames)):
     fn = keo_fit_filenames[i]
+    #~ print(fn)
     date_obs_str, exp_sec, sp_offset = get_fit_pars(keo_fit_path + '/' + fn)
     if sp_offset>3:
         continue    
@@ -229,8 +234,16 @@ for i in range(len(couples_fit_filenames)):
     
     dateobs1_str=fits.getval(fn,'DATE-OBS',0)
     dateobs2_str=fits.getval(fn,'DATE-OBS',1)
-    dateobs1=datetime.datetime.strptime(dateobs1_str,"%Y-%m-%dT%H:%M:%S.%f")
-    dateobs2=datetime.datetime.strptime(dateobs2_str,"%Y-%m-%dT%H:%M:%S.%f")
+    
+    try:
+        dateobs1=datetime.datetime.strptime(dateobs1_str,"%Y-%m-%dT%H:%M:%S.%f")
+    except:
+        dateobs1=datetime.datetime.strptime(dateobs1_str,"%Y-%m-%dT%H:%M:%S")
+    try:
+        dateobs2=datetime.datetime.strptime(dateobs2_str,"%Y-%m-%dT%H:%M:%S.%f")
+    except:        
+        dateobs2=datetime.datetime.strptime(dateobs2_str,"%Y-%m-%dT%H:%M:%S")
+        
     dateobs1x=dates.date2num(dateobs1)
     dateobs2x=dates.date2num(dateobs2)
     
