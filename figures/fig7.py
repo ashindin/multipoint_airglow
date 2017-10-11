@@ -242,5 +242,5 @@ plt.colorbar(pcm2,ax2_cb)
 plt.savefig('fig7.png',dpi=300)
 plt.savefig('fig7.pdf',dpi=300)
 plt.savefig('fig7.eps',dpi=300)
-plt.show()
+#plt.show()
 
