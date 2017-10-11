@@ -91,6 +91,10 @@ def download_check_unpack_data():
             os.makedirs(directory)
         ret+=os.system("tar xvjf "+filenames[8] +" -C "+ directory)
         
+        directory="."        
+        ret+=os.system("tar xvjf "+filenames[9] +" -C "+ directory)
+        ret+=os.system('chmod 700 ' + directory)
+        
         if ret==0:
             return 0
         else:
