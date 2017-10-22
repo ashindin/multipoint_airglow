@@ -93,6 +93,21 @@ def read_drop_args(dat_fn):
         
     return float(args_list[6]), a5, a6, aa
 
+def get_drop_max(dat_fn):
+    
+    def fun_to_minimize(z, a4, a5, a6):    
+        fun=(z/a4)**(a5 - 1)*((a4 - z)/a4)**(a6 - 1)*((a5 - 1)/(a5 + a6 - 2))**(-a5)*((a6 - 1)/(a5 + a6 - 2))**(-a6)*(a5*a6 - a5 - a6 + 1)/(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4) - np.exp(-1)
+        return -fun
+        
+    def fun_to_solve(z, a4, a5, a6):    
+        fun=(z/a4)**(a5 - 1)*((a4 - z)/a4)**(a6 - 1)*((a5 - 1)/(a5 + a6 - 2))**(-a5)*((a6 - 1)/(a5 + a6 - 2))**(-a6)*(a5*a6 - a5 - a6 + 1)/(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4) - np.exp(-1)
+        return fun
+    
+    a4, a5, a6, aa = read_drop_args(dat_fn)    
+    
+    res=so.minimize(fun_to_minimize, a4/2, (a4, a5, a6), method='Nelder-Mead')
+    max_z=res.x[0]
+    return max_z
 
 def get_drop_range(dat_fn):
     
@@ -136,11 +151,11 @@ def get_drop_range(dat_fn):
 #~ print(get_drop_range(dat_fn))
 
 #~ def fun_to_minimize(z, a4, a5, a6):    
-	#~ fun=(z/a4)**(a5 - 1)*((a4 - z)/a4)**(a6 - 1)*((a5 - 1)/(a5 + a6 - 2))**(-a5)*((a6 - 1)/(a5 + a6 - 2))**(-a6)*(a5*a6 - a5 - a6 + 1)/(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4) - np.exp(-1)
-	#~ return -fun
+    #~ fun=(z/a4)**(a5 - 1)*((a4 - z)/a4)**(a6 - 1)*((a5 - 1)/(a5 + a6 - 2))**(-a5)*((a6 - 1)/(a5 + a6 - 2))**(-a6)*(a5*a6 - a5 - a6 + 1)/(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4) - np.exp(-1)
+    #~ return -fun
 #~ def fun_to_solve(z, a4, a5, a6):    
-	#~ fun=(z/a4)**(a5 - 1)*((a4 - z)/a4)**(a6 - 1)*((a5 - 1)/(a5 + a6 - 2))**(-a5)*((a6 - 1)/(a5 + a6 - 2))**(-a6)*(a5*a6 - a5 - a6 + 1)/(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4) - np.exp(-1)
-	#~ return fun
+    #~ fun=(z/a4)**(a5 - 1)*((a4 - z)/a4)**(a6 - 1)*((a5 - 1)/(a5 + a6 - 2))**(-a5)*((a6 - 1)/(a5 + a6 - 2))**(-a6)*(a5*a6 - a5 - a6 + 1)/(a5**2 + 2*a5*a6 - 4*a5 + a6**2 - 4*a6 + 4) - np.exp(-1)
+    #~ return fun
 
 #~ a4, a5, a6, aa = read_drop_args(dat_fn) 
 #~ z_axe=np.linspace(-100000,100000,2000)

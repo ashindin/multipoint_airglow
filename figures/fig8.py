@@ -254,6 +254,8 @@ def get_model_height3(dat_filenames,smatrix_bool,stype, x_dates_clean, clean_pum
             dzb[i], dzt[i] = get_ellipsoid_range(dat_fn)
         elif sval==4:
 #             print(dat_fn)
+            hei[i] += get_drop_max(dat_fn)
+            #print(dat_fn,hei[i])
             dzb[i], dzt[i] = get_drop_range(dat_fn)
         else:
             dzb[i]=0.
@@ -365,19 +367,23 @@ plt.plot(ion_xdates,np.array(ion_b)/1000,'b--')
 plt.plot(hei_sphere_xdates, hei_sphere/1000,'ro')
 plt.plot(hei_spheroid_xdates, hei_spheroid/1000,'bs')
 
+heights_list=[]
+
 for i in range(len(hei_ellipsoid)):
     if dzt_ellipsoid[i]+dzb_ellipsoid[i]>5000 and dzt_ellipsoid[i]+dzb_ellipsoid[i] < 150000 and hei_ellipsoid[i]>175000:
         dat_fn=dat_sphere_filenames[i].replace('sphere','ellipsoid')
 #         print(dat_fn.replace('dat','png').replace('..',replace_str) + ' .')
         plt.plot([hei_ellipsoid_xdates[i],hei_ellipsoid_xdates[i]],[hei_ellipsoid[i]/1000-dzb_ellipsoid[i]/1000,hei_ellipsoid[i]/1000+dzt_ellipsoid[i]/1000],'m',lw=1)
         plt.plot(hei_ellipsoid_xdates[i], hei_ellipsoid[i]/1000,'ms',mec='k')
-
+        heights_list.append(hei_ellipsoid[i]/1000)
+        
 for i in range(len(hei_spheroid_incl)):
     if dzt_spheroid_incl[i]+dzb_spheroid_incl[i]>5000 and dzt_spheroid_incl[i]+dzb_spheroid_incl[i] < 150000 and hei_spheroid_incl[i]>175000:
         dat_fn=dat_sphere_filenames[i].replace('sphere','spheroid_incl')
 #         print(dat_fn.replace('dat','png').replace('..',replace_str) + ' .')
         plt.plot([hei_spheroid_incl_xdates[i],hei_spheroid_incl_xdates[i]],[hei_spheroid_incl[i]/1000-dzb_spheroid_incl[i]/1000,hei_spheroid_incl[i]/1000+dzt_spheroid_incl[i]/1000],'r',lw=1)
         plt.plot(hei_spheroid_incl_xdates[i], hei_spheroid_incl[i]/1000,'ro',mec='k')
+        heights_list.append(hei_spheroid_incl[i]/1000)
 
 for i in range(len(hei_drop)):
     if dzt_drop[i]+dzb_drop[i]>5000 and dzt_drop[i]+dzb_drop[i]<150000 and hei_drop[i]>175000:
@@ -385,6 +391,9 @@ for i in range(len(hei_drop)):
 #         print(dat_fn.replace('dat','png').replace('..',replace_str) + ' .')
         plt.plot([hei_drop_xdates[i],hei_drop_xdates[i]],[hei_drop[i]/1000-dzb_drop[i]/1000,hei_drop[i]/1000+dzt_drop[i]/1000],'g',lw=1)
         plt.plot(hei_drop_xdates[i], hei_drop[i]/1000,'gv',mec='k')
+        heights_list.append(hei_drop[i]/1000)
+
+print("MEAN24:",np.mean(heights_list),np.std(heights_list));
 
 plt.xticks(rotation=90)
 xlim_left=dates.date2num(datetime.datetime(2014,8,24,17,50))
@@ -483,7 +492,7 @@ for i in range(len(ion_lines)):
 fig=plt.figure(figsize=(6.69,3.34))
 ax=plt.axes(position=[0.1,0.22,0.87,0.75])
 ax.xaxis.set_major_locator(dates.MinuteLocator(byminute=range(2,62,3)))
-ax.xaxis.set_minor_locator(dates.MinuteLocator(byminute=range(4,64,3)))
+#ax.xaxis.set_minor_locator(dates.MinuteLocator(byminute=range(4,64,3)))
 xfmt = dates.DateFormatter('%H:%M')
 ax.xaxis.set_major_formatter(xfmt)
 
@@ -500,12 +509,15 @@ plt.plot(ion_xdates[166::],np.array(ion_b[166::])/1000,'b--')
 plt.plot(hei_sphere_xdates, hei_sphere/1000,'ro')
 plt.plot(hei_spheroid_xdates, hei_spheroid/1000,'bs')
 
+heights_list=[]
+
 for i in range(len(hei_ellipsoid)):
     if dzt_ellipsoid[i]+dzb_ellipsoid[i]>5000 and dzt_ellipsoid[i]+dzb_ellipsoid[i] < 150000 and hei_ellipsoid[i]>175000:
         dat_fn=dat_sphere_filenames[i].replace('sphere','ellipsoid')
 #         print(dat_fn.replace('dat','png').replace('..',replace_str) + ' .')
         plt.plot([hei_ellipsoid_xdates[i],hei_ellipsoid_xdates[i]],[hei_ellipsoid[i]/1000-dzb_ellipsoid[i]/1000,hei_ellipsoid[i]/1000+dzt_ellipsoid[i]/1000],'g')
         plt.plot(hei_ellipsoid_xdates[i], hei_ellipsoid[i]/1000,'gv')
+        heights_list.append(hei_ellipsoid[i]/1000)
 
 for i in range(len(hei_spheroid_incl)):
     if dzt_spheroid_incl[i]+dzb_spheroid_incl[i]>5000 and dzt_spheroid_incl[i]+dzb_spheroid_incl[i] < 150000 and hei_spheroid_incl[i]>175000 and hei_spheroid_incl[i]<310000:
@@ -513,13 +525,17 @@ for i in range(len(hei_spheroid_incl)):
 #         print(dat_fn.replace('dat','png').replace('..',replace_str) + ' .')
         plt.plot([hei_spheroid_incl_xdates[i],hei_spheroid_incl_xdates[i]],[hei_spheroid_incl[i]/1000-dzb_spheroid_incl[i]/1000,hei_spheroid_incl[i]/1000+dzt_spheroid_incl[i]/1000],'r',lw=1)
         plt.plot(hei_spheroid_incl_xdates[i], hei_spheroid_incl[i]/1000,'ro',mec='k')
-
+        heights_list.append(hei_spheroid_incl[i]/1000)
+        
 for i in range(len(hei_drop)):
     if dzt_drop[i]+dzb_drop[i]>5000 and dzt_drop[i]+dzb_drop[i]<150000 and hei_drop[i]>175000:
         dat_fn=dat_sphere_filenames[i].replace('sphere','drop')
 #         print(dat_fn.replace('dat','png').replace('..',replace_str) + ' .')
         plt.plot([hei_drop_xdates[i],hei_drop_xdates[i]],[hei_drop[i]/1000-dzb_drop[i]/1000,hei_drop[i]/1000+dzt_drop[i]/1000],'k')
         plt.plot(hei_drop_xdates[i], hei_drop[i]/1000,'k8')
+        heights_list.append(hei_drop[i]/1000)
+
+print("MEAN26:",np.mean(heights_list),np.std(heights_list));
 
 plt.xticks(rotation=90)
 xlim_left=dates.date2num(datetime.datetime(2014,8,26,19,26))
