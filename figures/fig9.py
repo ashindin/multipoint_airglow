@@ -15,6 +15,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
+coef=5.15/5.627;
+
 # In[3]:
 
 cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"../comparing")))
@@ -392,16 +394,16 @@ for i in range(len(hei_ellipsoid)):
 
         fun, mod_pos, pars = get_model_pars(dat_fn)
         conc.append(pars[0])
-        plt.plot([hei_ellipsoid_xdates[i],hei_ellipsoid_xdates[i]],[pars[0]-err_range,pars[0]+err_range],'m',lw=1)
-        plt.plot(hei_ellipsoid_xdates[i], pars[0],'ms',mec='k')
+        plt.plot([hei_ellipsoid_xdates[i],hei_ellipsoid_xdates[i]],[coef*pars[0]-err_range,coef*pars[0]+err_range],'m',lw=1)
+        plt.plot(hei_ellipsoid_xdates[i], coef*pars[0],'ms',mec='k')
 
 for i in range(len(hei_spheroid_incl)):
     if dzt_spheroid_incl[i]+dzb_spheroid_incl[i]>5000 and dzt_spheroid_incl[i]+dzb_spheroid_incl[i] < 150000 and hei_spheroid_incl[i]>175000:
         dat_fn=dat_sphere_filenames[i].replace('sphere','spheroid_incl')
         fun, mod_pos, pars = get_model_pars(dat_fn)
         conc.append(pars[0])
-        plt.plot([hei_spheroid_incl_xdates[i],hei_spheroid_incl_xdates[i]],[pars[0]-err_range,pars[0]+err_range],'r',lw=1)
-        plt.plot(hei_spheroid_incl_xdates[i], pars[0],'ro',mec='k')
+        plt.plot([hei_spheroid_incl_xdates[i],hei_spheroid_incl_xdates[i]],[coef*pars[0]-err_range,coef*pars[0]+err_range],'r',lw=1)
+        plt.plot(hei_spheroid_incl_xdates[i], coef*pars[0],'ro',mec='k')
 
 for i in range(len(hei_drop)):
     if dzt_drop[i]+dzb_drop[i]>5000 and dzt_drop[i]+dzb_drop[i]<150000 and hei_drop[i]>175000:
@@ -409,8 +411,8 @@ for i in range(len(hei_drop)):
         dat_fn=dat_sphere_filenames[i].replace('sphere','drop')
         fun, mod_pos, pars = get_model_pars(dat_fn)
         conc.append(pars[0])
-        plt.plot([hei_drop_xdates[i],hei_drop_xdates[i]],[pars[0]-err_range,pars[0]+err_range],'g',lw=1)
-        plt.plot(hei_drop_xdates[i], pars[0],'gv',mec='k')
+        plt.plot([hei_drop_xdates[i],hei_drop_xdates[i]],[coef*pars[0]-err_range,coef*pars[0]+err_range],'g',lw=1)
+        plt.plot(hei_drop_xdates[i], coef*pars[0],'gv',mec='k')
 
 plt.xticks(rotation=90)
 xlim_left=dates.date2num(datetime.datetime(2014,8,24,17,50))
@@ -435,7 +437,7 @@ plt.savefig("fig9_1.eps",dpi=300)
 plt.close()
 # plt.show()
 
-print(np.mean(conc),np.std(conc))
+print(np.mean(coef*np.array(conc)),np.std(coef*np.array(conc)))
 
 
 # In[15]:
@@ -531,24 +533,24 @@ for i in range(len(hei_ellipsoid)):
         dat_fn=dat_sphere_filenames[i].replace('sphere','ellipsoid')
         fun, mod_pos, pars = get_model_pars(dat_fn)
         conc.append(pars[0])
-        plt.plot([hei_ellipsoid_xdates[i],hei_ellipsoid_xdates[i]],[pars[0]-err_range,pars[0]+err_range],'g')
-        plt.plot(hei_ellipsoid_xdates[i], pars[0],'gv')
+        plt.plot([hei_ellipsoid_xdates[i],hei_ellipsoid_xdates[i]],[coef*pars[0]-err_range,coef*pars[0]+err_range],'g')
+        plt.plot(hei_ellipsoid_xdates[i], coef*pars[0],'gv')
 
 for i in range(len(hei_spheroid_incl)):
     if dzt_spheroid_incl[i]+dzb_spheroid_incl[i]>5000 and dzt_spheroid_incl[i]+dzb_spheroid_incl[i] < 150000 and hei_spheroid_incl[i]>175000 and hei_spheroid_incl[i]<310000:
         dat_fn=dat_sphere_filenames[i].replace('sphere','spheroid_incl')
         fun, mod_pos, pars = get_model_pars(dat_fn)
         conc.append(pars[0])
-        plt.plot([hei_spheroid_incl_xdates[i],hei_spheroid_incl_xdates[i]],[pars[0]-err_range,pars[0]+err_range],'r',lw=1)
-        plt.plot(hei_spheroid_incl_xdates[i], pars[0],'ro',mec='k')
+        plt.plot([hei_spheroid_incl_xdates[i],hei_spheroid_incl_xdates[i]],[coef*pars[0]-err_range,coef*pars[0]+err_range],'r',lw=1)
+        plt.plot(hei_spheroid_incl_xdates[i], coef*pars[0],'ro',mec='k')
 
 for i in range(len(hei_drop)):
     if dzt_drop[i]+dzb_drop[i]>5000 and dzt_drop[i]+dzb_drop[i]<150000 and hei_drop[i]>175000:
         dat_fn=dat_sphere_filenames[i].replace('sphere','drop')
         fun, mod_pos, pars = get_model_pars(dat_fn)
         conc.append(pars[0])
-        plt.plot([hei_drop_xdates[i],hei_drop_xdates[i]],[pars[0]-err_range,pars[0]+err_range],'k')
-        plt.plot(hei_drop_xdates[i], pars[0],'k8')
+        plt.plot([hei_drop_xdates[i],hei_drop_xdates[i]],[coef*pars[0]-err_range,coef*pars[0]+err_range],'k')
+        plt.plot(hei_drop_xdates[i], coef*pars[0],'k8')
 
 plt.xticks(rotation=90)
 xlim_left=dates.date2num(datetime.datetime(2014,8,26,19,26))
@@ -567,7 +569,7 @@ plt.legend([h_sp],['M4'])
 # plt.close()
 # plt.show()
 
-print(np.mean(conc),np.std(conc))
+print(np.mean(coef*np.array(conc)),np.std(coef*np.array(conc)))
 
 
 # In[23]:
