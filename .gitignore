@@ -33,6 +33,7 @@ image_processing/couples140826
 image_processing/couples160829
 modelling/*.dat
 modelling/model_*.py
+modelling/temp_*
 modelling/__pycache__/
 solving/sphere
 solving/spheroid
