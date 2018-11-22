@@ -147,7 +147,7 @@ def shift_img(img_base, base_time, obs_time):
         #~ if (x0+1>=1) and (y0+1>=1) and (x0+1<img_base.shape[1]) and (y0+1<img_base.shape[0]):
             #~ img_mod[y0+1,x0+1]=img_mod[y0+1,x0+1]+(x)*(y)*img_base.flat[i];
     #~ img_mod.flat[np.where(img_mod.flat == 0.)[0]]=med_value
-    img_mod = si.griddata((YPIX2.flat,XPIX2.flat), img_base.flat, (XPIX, YPIX), fill_value=med_value, method='linear')
+    img_mod = si.griddata((YPIX2.flat,XPIX2.flat), img_base.flat, (YPIX, XPIX), fill_value=med_value, method='linear')
     return img_mod;
 
 
